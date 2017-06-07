@@ -1,0 +1,3 @@
+* {display: none}
+label {display: block; visibility: visible; border: 2px solid #ccc;}
+select  {display: block; visibility: visible; border: 2px solid #ccc;}

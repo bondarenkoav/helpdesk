@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% load short_fio %}
+
+{% block title %}Заявка №{{ request_id }}{% endblock %}
+
+{% block title_body %}
+
+{% endblock %}
+
+{% block title_body_h1 %}Заявка №{{ request_id }}{% endblock %}
+{% block title_body_small %}
+    {% if status != "complete" and status != "canceled" and request_id != None %}
+        <a href="/build/{{ request_id }}/acts/item/None/">Добавить акт</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <form action="/build/item/{{ request_id }}/" method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary text-center" style="margin-top: 10px;">
+                            Сохранить
+                        </button>
+                    {% endbuttons %}
+                </form>
+
+            </div>
+        </div>
+
+        <div class="list-group">
+            {% for item in list_acts %}
+                <a href="/build/{{ request_id }}/acts/item/{{ item.id }}/" class="list-group-item">
+                    <span class="lead">{{ forloop.counter }}.</span> Акт №{{ item.id }} от {{ item.Day_reporting }}:
+                    {% for cowork in item.CoWorkers.all %}
+                        {{ cowork.Person_FIO|short_fio }},
+                    {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
+
+    </div>
+
+{% endblock %}

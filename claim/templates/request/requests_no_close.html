@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Список открытых заявок{% endblock %}
+
+{% block dop_link %}
+    <a href="/request/item/" class="blog-nav-item col-md-offset-1">Добавить заявку</a>
+    <a href="/request/date/" class="blog-nav-item">На дату</a>
+{% endblock %}
+
+{% block content %}
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 5%;">№ заявки</td>
+                    <td style="width: 10%;">Дата/время добавления</td>
+                    <td style="width: 5%;">№ объекта</td>
+                    <td style="width: 20%;">Адрес объекта</td>
+                    <td style="width: 15%;">Контрагент</td>
+                    <td style="width: 15%;">Вид неисправности</td>
+                    <td style="width: 10%;">Запланировано</td>
+                    <td style="width: 10%;">Исполнитель</td>
+                    <td style="width: 10%;">Статус</td>
+                    <td style="width: 10%;">Внёс</td>
+                </tr>
+            </thead>
+
+            {% for item in requests %}
+                <tbody>
+                <tr id="obj_{{ item.id }}" onclick="location.href = '/request/item/{{ item.id }}/';">
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.DateTime_add }}</td>
+                    <td class="text-center">{{ item.NumObject }}</td>
+                    <td>{{ item.AddressObject }}</td>
+                    <td>{{ item.Client }}</td>
+                    <td>{{ item.FaultAppearance }}</td>
+                    <td class="text-center">{{ item.DateTime_schedule }}</td>
+                    <td>{{ item.CoWorkers }}</td>
+                    <td>{{ item.Author.last_name }}</td>
+                </tr>
+                </tbody>
+            {% endfor %}
+
+        </table>
+    </div>
+
+{% endblock %}
+
+{% block pagination %}
+
+    <ul class="pagination pagination">
+        {% if requests.has_previous %}
+            <li><a href="/request/no_close/page/{{ requests.previous_page_number }}/">&laquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="">&laquo;</a></li>
+        {% endif %}
+
+        {% for page in requests.paginator.page_range %}
+            {% if page == co_worker.value %}
+                <li class="active"><a href="/request/no_close/page/{{ page }}/">{{ page }}</a></li>
+            {% else %}
+                <li><a href="/request/no_close/page/{{ page }}/">{{ page }}</a></li>
+            {% endif %}
+        {% endfor %}
+
+        {% if requests.has_next %}
+            <li><a href="/request/no_close/page/{{ requests.next_page_number }}/">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="">&raquo;</a></li>
+        {% endif %}
+    </ul>
+
+{% endblock %}

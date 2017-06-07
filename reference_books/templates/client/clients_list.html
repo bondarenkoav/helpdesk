@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Список исполнителей{% endblock %}
+
+    {% block title_body_h1 %}Список контрагентов{% endblock %}
+    {% block title_body_small %}<a href="/reference_books/clients/item/">Добавить контрагента</a>{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+
+                <thead>
+                    <tr class="text-center">
+                        <td style="width: 10%;">№ п/п</td>
+                        <td style="width: 90%;">Наименование контрагента</td>
+                    </tr>
+                </thead>
+
+                {% for item in list_clients %}
+                    <tbody>
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '/reference_books/clients/item/{{ item.id }}/';">
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>{{ item.Name }}</td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+    {% endblock %}

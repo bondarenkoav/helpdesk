@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Список заявок{% endblock %}
+
+    {% block dop_link %}
+        <a href="/maintenance/objects/item/" class="blog-nav-item col-md-offset-1">Добавить объект</a>
+    {% endblock %}
+
+    {% block title_body_h1 %}Список объектов ТО{% endblock %}
+    {% block title_body_small %}в текущем месяце{% endblock %}
+
+    {% block content %}
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr class="text-center">
+                        <td style="width: 5%;">№ объекта</td>
+                        <td style="width: 25%;">Адрес объекта</td>
+                        <td style="width: 20%;">Контрагент</td>
+                        <td style="width: 20%;">Тип сигнализации</td>
+                        <td style="width: 15%;">Период обслуживания</td>
+                        <td style="width: 15%;">Состояние</td>
+                    </tr>
+                </thead>
+
+                {% for item in objects_cur_month %}
+                    <tbody>
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '/maintenance/objects/item/{{ item.id }}/';">
+                        <td class="text-center">{{ item.NumObject }}</td>
+                        <td>{{ item.AddressObject }}</td>
+                        <td class="text-center">{{ item.Client }}</td>
+                        <td class="text-center">
+                            {% for type in item.TypeSecurity.all %}
+                                {{ type.Name }},
+                            {% endfor %}</td>
+                        <td class="text-center">
+                            {{ item.Year_schedule }}
+                            (
+                                {% for month in item.Month_schedule.all %}
+                                    {{ month.Month_num }},
+                                {% endfor %}
+                            )
+                        </td>
+                        <td class="text-center">{{ item.Status }}</td>
+                    </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+
+    {% endblock %}
+
+    {% block pagination %}
+        <div class="row">
+            <div class="col-xs-4" style="margin-top: 20px;">
+                <p class="all-paginate">
+                    <i>Страница {{ objects.number }} из {{ objects.paginator.num_pages }}.</i>
+                </p>
+            </div>
+            <div class="col-xs-8">
+                <ul class="pagination pagination">
+                    <ul class="pagination" style="margin-top:5px;">
+                        <li {% if not objects.has_previous %}class="disabled"{% endif %}>
+                            <a {% if objects.has_previous %}href="/{{ status.slug }}/page/{{ objects.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
+                        </li>
+                        <li><a href="/{{ status.slug }}/page/1/">Первая</a></li>
+                        {% for page in page_range %}
+                            {% ifequal page objects.number %}
+                                <li class="active">
+                                    <a>{{ objects.number }}<span class="sr-only">(текущая)</span></a>
+                                </li>
+                            {% else %}
+                                <li><a href="/{{ status.slug }}/page/{{ page }}/">{{ page }}</a></li>
+                            {% endifequal %}
+                        {% endfor %}
+                        <li><a href="/{{ status.slug }}/page/{{ objects.paginator.num_pages }}/">Последняя</a></li>
+                        <li {% if not objects.has_next %}class="disabled"{% endif %}>
+                            <a {% if objects.has_next %}href="/{{ status.slug }}/page/{{ objects.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+        </div>
+    {% endblock %}

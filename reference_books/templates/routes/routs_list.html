@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Маршруты ТО{% endblock %}
+
+    {% block title_body_h1 %}Список маршрутов Технического обслуживания{% endblock %}
+    {% block title_body_small %}<a href="/reference_books/routs/item/">Добавить маршрут</a>{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <td style="width: 20%;">№ маршрута</td>
+                        <td style="width: 80%;">Описание</td>
+                    </tr>
+                </thead>
+
+                {% for item in routs %}
+                    <tbody>
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '/reference_books/routs/item/{{ item.id }}/';">
+                            <td>{{ item.Number }}</td>
+                            <td>{{ item.Descript }}</td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+    {% endblock %}

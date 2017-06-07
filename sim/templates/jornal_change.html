@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Список заявок{% endblock %}
+
+{% block title_body_h1 %}Журнал изменений{% endblock %}
+{% block title_body_small %}Раздел - SIM-карты{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 10%;">#</td>
+                <td style="width: 20%;">Раздел</td>
+                <td style="width: 20%;">Дата записи</td>
+                <td style="width: 15%;">Событие</td>
+                <td style="width: 25%;">Предыдущая запись</td>
+                <td style="width: 10%;">Автор</td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in jornal_changes %}
+                    <tr class="text-center">
+                        <td>{{ item.id }}</td>
+                        <td>{{ item.application }}</td>
+                        <td>{{ item.add_date }}</td>
+                        <td>{{ item.event_code }}</td>
+                        <td>{{ item.old_value }}</td>
+                        <td>{{ item.user }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block pagination %}
+    <div class="row">
+        <div class="col-xs-4" style="margin-top: 7px;">
+            <p class="all-paginate">
+                <i>Страница {{ jornal_changes.number }} из {{ jornal_changes.paginator.num_pages }}.</i>
+            </p>
+        </div>
+        <div class="col-xs-8">
+            <ul class="pagination pagination">
+                <ul class="pagination" style="margin-top:5px;">
+                    <li {% if not jornal_changes.has_previous %}class="disabled"{% endif %}>
+                        <a {% if jornal_changes.has_previous %}href="/simcard/page/{{ jornal_changes.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
+                    </li>
+                    <li><a href="/simcard/page/1/">Первая</a></li>
+                    {% for page in page_range %}
+                        {% ifequal page jornal_changes.number %}
+                            <li class="active">
+                                <a>{{ jornal_changes.number }}<span class="sr-only">(текущая)</span></a>
+                            </li>
+                        {% else %}
+                            <li><a href="/simcard/page/{{ page }}/">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% endfor %}
+                    <li><a href="/simcard/page/{{ jornal_changes.paginator.num_pages }}/">Последняя</a></li>
+                    <li {% if not jornal_changes.has_next %}class="disabled"{% endif %}>
+                        <a {% if jornal_changes.has_next %}href="/simcard/page/{{ jornal_changes.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
+                    </li>
+                </ul>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

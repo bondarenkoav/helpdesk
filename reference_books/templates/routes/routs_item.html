@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title_body_h1 %}Список моделей передатчиков{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <form action="/reference_books/routs/item/{{ routes_id }}/" method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                            Сохранить
+                        </button>
+                    {% endbuttons %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

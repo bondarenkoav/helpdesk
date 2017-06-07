@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Список заявок{% endblock %}
+
+{% block title_body_h1 %}SIM-карты -{% if status == 'active' %} активные {% else %} не активные {% endif %}{% endblock %}
+{% block title_body_small %}{% if status == 'active' %}<a href="/simcard/item/None/">Добавить SIM-карту</a>{% endif %}{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 10%;">№ SIM-карты</td>
+                <td style="width: 20%;">Оператор</td>
+                <td style="width: 20%;">Контрагент</td>
+                <td style="width: 15%;">Тип применения</td>
+                <td style="width: 25%;">Применяется</td>
+                <td style="width: 10%;">Состояние</td>
+            </tr>
+            </thead>
+            <tbody>
+                {% for item in simcards %}
+                    <tr id="obj_{{ item.id }}" class="text-center" onclick="location.href = '/simcard/item/{{ item.id }}/';">
+                        <td>{{ item.Number_SIM }}</td>
+                        <td>{{ item.OpSoSRate }}</td>
+                        <td>{{ item.Owner }}</td>
+                        <td>{{ item.Use_type }}</td>
+                        <td>
+                            {% if item.Use_type.slug == 'usesim_object' %}
+                                №{{ item.Use_numberobject }} ({{ item.Use_addressobject }})
+                            {% else %}
+                                {{ item.Use_user }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if item.Status == True %}
+                                Активна
+                            {% else %}
+                                Не активна
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block pagination %}
+    <div class="row">
+        <div class="col-xs-4" style="margin-top: 7px;">
+            <p class="all-paginate">
+                <i>Страница {{ simcards.number }} из {{ simcards.paginator.num_pages }}.</i>
+            </p>
+        </div>
+        <div class="col-xs-8">
+            <ul class="pagination pagination">
+                <ul class="pagination" style="margin-top:5px;">
+                    <li {% if not simcards.has_previous %}class="disabled"{% endif %}>
+                        <a {% if simcards.has_previous %}href="/simcard//{{ status.slug }}/page/{{ simcards.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
+                    </li>
+                    <li><a href="/simcard/{{ status.slug }}/page/1/">Первая</a></li>
+                    {% for page in page_range %}
+                        {% ifequal page simcards.number %}
+                            <li class="active">
+                                <a>{{ simcards.number }}<span class="sr-only">(текущая)</span></a>
+                            </li>
+                        {% else %}
+                            <li><a href="/simcard/{{ status.slug }}/page/{{ page }}/">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% endfor %}
+                    <li><a href="/simcard/{{ status.slug }}/page/{{ simcards.paginator.num_pages }}/">Последняя</a></li>
+                    <li {% if not simcards.has_next %}class="disabled"{% endif %}>
+                        <a {% if simcards.has_next %}href="/simcard/{{ status.slug }}/page/{{ simcards.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
+                    </li>
+                </ul>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Список заявок{% endblock %}
+
+{% block title_body_h1 %}Устранение неисправностей с привязкой к плановому ТО{% endblock %}
+{% block title_body_small %}<a href="/maintenance/trouble_shooting/item/None/">Добавить заявку</a>{% endblock %}
+
+{% block content %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 5%;">№ заявки</td>
+                <td style="width: 10%;">Дата/время добавления</td>
+                <td style="width: 5%;">№ объекта</td>
+                <td style="width: 15%;">Адрес объекта</td>
+                <td style="width: 15%;">Контрагент</td>
+                <td style="width: 15%;">Вид неисправности</td>
+                <td style="width: 10%;">Запланировано</td>
+                <td style="width: 10%;">Исполнитель</td>
+                <td style="width: 15%;">Автор</td>
+            </tr>
+            </thead>
+            {% for item in requests %}
+                <tbody>
+                <tr id="obj_{{ item.id }}" onclick="location.href = '/maintenance/trouble_shooting/item/{{ item.id }}/';">
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.DateTime_add }}</td>
+                    <td class="text-center">{{ item.NumObject }}</td>
+                    <td>{{ item.AddressObject }}</td>
+                    <td>{{ item.Client }}</td>
+                    <td>{{ item.FaultAppearance }}</td>
+                    <td class="text-center">{{ item.DateTime_schedule }}</td>
+                    <td>
+                        {% for cowork in item.CoWorkers.all %}
+                            {{ cowork.Person_FIO|short_fio }},
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li>Создал: {{ item.Create_user|get_user_publics }}</li>
+                            <li>Обновил: {{ item.Update_user|get_user_publics }}</li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}
+
+{% block pagination %}
+    <div class="row">
+        <div class="col-xs-4" style="margin-top: 20px;">
+            <p class="all-paginate">
+                <i>Страница {{ requests.number }} из {{ requests.paginator.num_pages }}.</i>
+            </p>
+        </div>
+        <div class="col-xs-8">
+            <ul class="pagination pagination">
+                <ul class="pagination" style="margin-top:5px;">
+                    <li {% if not requests.has_previous %}class="disabled"{% endif %}>
+                        <a {% if requests.has_previous %}href="/maintenance/trouble_shooting//{{ status.slug }}/page/{{ requests.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
+                    </li>
+                    <li><a href="/maintenance/trouble_shooting/{{ status.slug }}/page/1/">Первая</a></li>
+                    {% for page in page_range %}
+                        {% ifequal page requests.number %}
+                            <li class="active">
+                                <a>{{ requests.number }}<span class="sr-only">(текущая)</span></a>
+                            </li>
+                        {% else %}
+                            <li><a href="/maintenance/trouble_shooting/{{ status.slug }}/page/{{ page }}/">{{ page }}</a></li>
+                        {% endifequal %}
+                    {% endfor %}
+                    <li><a href="/maintenance/trouble_shooting/{{ status.slug }}/page/{{ requests.paginator.num_pages }}/">Последняя</a></li>
+                    <li {% if not requests.has_next %}class="disabled"{% endif %}>
+                        <a {% if requests.has_next %}href="/maintenance/trouble_shooting/{{ status.slug }}/page/{{ requests.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
+                    </li>
+                </ul>
+            </ul>
+        </div>
+    </div>
+{% endblock %}

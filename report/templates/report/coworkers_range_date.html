@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% load short_fio %}
+
+    {% block title %}Заявка на {{ filter }}{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block title_body_h1 %}Список исполнителей по объектам{% endblock %}
+    {% block title_body_small %}с {{ acts_date_start }} по {{ acts_date_stop }}{% endblock %}
+
+    {% block content %}
+        <div class="container panel panel-default noprint">
+            <div class="panel-body">
+                <form action="/report/coworkers_range_date/" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+{#                        <div class="col-xs-2"></div>#}
+                        <div class="col-xs-8 text-right">
+                            {% bootstrap_form form %}
+                        </div>
+                        <div class="col-xs-4 text-left">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary btn-lg">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+{#                        <div class="col-xs-2"></div>#}
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <td style="width: 20%;">Исполнитель</td>
+                            <td style="width: 20%;">Тип заявки</td>
+                            <td style="width: 20%;">Дата</td>
+                            <td style="width: 40%;">Объект</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cowork_item in coworkers %}
+
+                            {% for item_build in list_build %}
+                                {% for cowork in item_build.CoWorkers.all %}
+                                    {% if cowork.id == cowork_item.id %}
+                                        <tr>
+                                            <td class="text-center">{{ cowork_item.Person_FIO|short_fio }}</td>
+                                            <td class="text-center">Монтаж</td>
+                                            <td class="text-center">{{ item_build.Day_reporting }}</td>
+                                            <td class="text-center">{{ item_build.build_request.Client.Name }} ({{ item_build.build_request.AddressObject }})</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+
+                            {% for item_claim in list_claim %}
+                                {% for cowork in item_claim.CoWorkers.all %}
+                                    {% if cowork.id == cowork_item.id %}
+                                        <tr>
+                                            <td class="text-center">{{ cowork_item.Person_FIO|short_fio }}</td>
+                                            <td class="text-center">Неисправности</td>
+                                            <td class="text-center">{{ item_claim.DateTime_work }}</td>
+                                            <td class="text-center">
+                                                {% if item_claim.Client_bd != None %}
+                                                    {{ item_claim.Client_bd }}
+                                                {% else %}
+                                                    {{ item_claim.Client }}
+                                                {% endif %}
+                                                ({{ item_claim.NumObject }} - {{ item_claim.AddressObject }})</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+
+                            {% for item_maintenance in list_maintenance %}
+                                {% for cowork in item_maintenance.CoWorkers.all %}
+                                    {% if cowork.id == cowork_item.id %}
+                                        <tr>
+                                            <td class="text-center">{{ cowork_item.Person_FIO|short_fio }}</td>
+                                            <td class="text-center">ТО</td>
+                                            <td class="text-center">{{ item_maintenance.DateTime_work }}</td>
+                                            <td class="text-center">{{ item_maintenance.Object.Client }} ({{ item_maintenance.Object.AddressObject }})</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endblock %}

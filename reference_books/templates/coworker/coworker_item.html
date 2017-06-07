@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block dop_css %}
+    <link rel="stylesheet" type="text/css" href="{% static "static/css/suggestions-15.12.css" %}"  />
+{% endblock %}
+
+{% block title %}Исполнитель{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">Исполнитель</div>
+            <div class="panel-body">
+
+                <form action="/reference_books/coworker/item/{{ coworker_id }}/" method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
+                            Сохранить
+                        </button>
+                    {% endbuttons %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block nav_footer_tools %}
+    <div class="btn-group btn" role="group">
+        <button type="button" class="btn btn-danger btn-lg">Удалить</button>
+    </div>
+{% endblock %}
+
+{% block dop_js %}
+    <script type="text/javascript" src="{% static "static/js/jquery.suggestions-15.12.min.js" %}"></script>
+    <script type="text/javascript" src="{% static "static/js/DaData.js" %}"></script>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+{% block title %}Акт №{{ akt_id }}{% endblock %}
+
+{% block title_body %}
+
+{% endblock %}
+
+{% block title_body_h1 %}Акт{% endblock %}
+{% block title_body_small %}№ {{ act_id }}{% endblock %}
+
+{% block content %}
+
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+
+                <form action="/build/acts/item/{{ act_id }}/" method="post" class="form">
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary btn-lg text-center" style="margin-top: 10px;">
+                            Сохранить ->
+                        </button>
+                    {% endbuttons %}
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

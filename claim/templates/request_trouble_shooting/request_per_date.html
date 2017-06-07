@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% load short_fio %}
+
+    {% block title %}Заявка на {{ filter }}{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block title_body_h1 %}Поиск заявок{% endblock %}
+    {% block title_body_small %}с параметризацией{% endblock %}
+
+    {% block content %}
+        <div class="container panel panel-default noprint">
+            <div class="panel-body">
+                <form action="/date/" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-11">
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-1 text-center" style="margin-left: -110px;">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary btn-lg">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                    <tr class="text-center">
+                        <td style="width: 5%;">№</td>
+                        <td style="width: 10%;">Добавлено</td>
+                        <td style="width: 7%;">Запланировано</td>
+                        <td style="width: 15%;">Объект</td>
+                        <td style="width: 10%;">Контрагент</td>
+                        <td style="width: 10%;">Вид неисправности</td>
+                        <td style="width: 10%;">Исполнитель</td>
+                        <td style="width: 5%;">Статус</td>
+                        <td style="width: 18%;">Описание устранения причины</td>
+                    </tr>
+                    </thead>
+                    {% for item in requests %}
+                        <tbody>
+                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('/item/{{ item.id }}/')";>
+                                <td class="text-center">{{ item.id }}</td>
+                                <td class="text-center">{{ item.DateTime_add }}</td>
+                                <td class="text-center">{{ item.DateTime_schedule }}</td>
+                                <td class="text-right">{{ item.NumObject }} ({{ item.AddressObject }})</td>
+                                <td class="text-right">{{ item.Client }}</td>
+                                <td class="text-center">{{ item.FaultAppearance }}</td>
+                                <td class="text-center">
+                                    {% for cowork in item.CoWorkers.all %}
+                                        {{ cowork.Person_FIO|short_fio }},
+                                    {% endfor %}
+                                </td>
+                                <td class="text-center">{{ item.Status }}</td>
+                                <td>{{ item.DescriptionWorks }}</td>
+                            </tr>
+                        </tbody>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endblock %}

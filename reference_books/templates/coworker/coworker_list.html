@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Список исполнителей{% endblock %}
+
+    {% block dop_link %}
+        <li></li>
+    {% endblock %}
+
+    {% block title_body_h1 %}Список исполнителей{% endblock %}
+    {% block title_body_small %}<a href="/reference_books/coworker/item/">Добавить исполнителя</a>{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <td style="width: 5%;">№ п/п</td>
+                        <td style="width: 40%;">ФИО сотрудника</td>
+                        <td style="width: 15%;">Должность</td>
+                        <td style="width: 10%;">Занятость</td>
+                        <td style="width: 20%;">Компания</td>
+                        <td style="width: 10%;">Город</td>
+                    </tr>
+                </thead>
+
+                {% for item in co_worker %}
+                    <tbody>
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '/reference_books/coworker/item/{{ item.id }}/';">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.Person_FIO }}</td>
+                            <td>{{ item.Posts }}</td>
+                            <td>
+                                {% if item.StatusWorking %}
+                                    Работает
+                                {% else %}
+                                    Уволен
+                                {% endif %}
+                            </td>
+                            <td>{{ item.ServingCompany }}</td>
+                            <td>{{ item.ServingCompany.City }}</td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+    {% endblock %}
+
+    {% block pagination %}
+
+        <ul class="pagination pagination">
+            {% if co_worker.has_previous %}
+                <li><a href="/reference_books/coworker/page/{{ co_worker.previous_page_number }}/">&laquo;</a></li>
+            {% else %}
+                <li class="disabled"><a href="">&laquo;</a></li>
+            {% endif %}
+
+            {% for page in co_worker.paginator.page_range %}
+                {% if page == co_worker.value %}
+                    <li class="active"><a href="/reference_books/coworker/page/{{ page }}/">{{ page }}</a></li>
+                {% else %}
+                    <li><a href="/reference_books/coworker/page/{{ page }}/">{{ page }}</a></li>
+                {% endif %}
+            {% endfor %}
+
+            {% if co_worker.has_next %}
+                <li><a href="/reference_books/coworker/page/{{ co_worker.next_page_number }}/">&raquo;</a></li>
+            {% else %}
+                <li class="disabled"><a href="">&raquo;</a></li>
+            {% endif %}
+        </ul>
+
+    {% endblock %}

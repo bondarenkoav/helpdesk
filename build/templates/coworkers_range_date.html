@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+{% load short_fio %}
+
+    {% block title %}Заявка на {{ filter }}{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block title_body_h1 %}Список исполнителей по объектам{% endblock %}
+    {% block title_body_small %}с {{ acts_date_start }} по {{ acts_date_stop }}{% endblock %}
+
+    {% block content %}
+        <div class="container panel panel-default noprint">
+            <div class="panel-body">
+                <form action="/build/coworkers_range_date/" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-10">
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-2">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary text-center">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <td style="width: 25%;">Исполнитель</td>
+                            <td style="width: 25%;">Дата</td>
+                            <td style="width: 40%;">Объект</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cowork_item in coworkers %}
+                            {% for item_works in list_works %}
+                                {% for cowork in item_works.CoWorkers.all %}
+                                    {% if cowork.id == cowork_item.id %}
+                                        <tr>
+                                            <td class="text-center">{{ cowork_item.Person_FIO|short_fio }}</td>
+                                            <td class="text-center">{{ item_works.Day_reporting }}</td>
+                                            <td class="text-center">{{ item_works.support_request.id }} ({{ item_works.support_request.AddressObject }})</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endfor %}
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endblock %}

@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+{% load bootstrap3 %}
+
+{% block title %}Список заявок{% endblock %}
+
+{% block dop_link %}
+    <li><a href="/request/item/">Добавить заявку</a></li>
+    <li><a href="/request/date/">На дату</a></li>
+{% endblock %}
+
+{% block title_body_h1 %}Техническое обслуживание{% endblock %}
+{% block title_body_small %}{{ status.Name }}{% endblock %}
+
+{% block content %}
+    <div class="container panel panel-default noprint">
+
+        <div class="panel-body">
+            <form action="/maintenance/{{ status.slug }}/" method="post" class="form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-10">
+                        {% bootstrap_form form layout='horizontal' %}
+                    </div>
+                    <div class="col-xs-2">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary text-center" style="height: 75px;">Вывести</button>
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 5%;">№ п/п</td>
+                <td style="width: 5%;">№ заявки</td>
+                <td style="width: 10%;">Дата/время добавления</td>
+                <td style="width: 5%;">№ объекта</td>
+                <td style="width: 15%;">Адрес объекта</td>
+                <td style="width: 15%;">Контрагент</td>
+                <td style="width: 15%;">Объём работ</td>
+                <td style="width: 10%;">Запланировано</td>
+                <td style="width: 10%;">Исполнитель</td>
+                <td style="width: 10%;">Автор</td>
+            </tr>
+            </thead>
+            {% for item in requests %}
+                <tbody>
+                <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('/maintenance/item/{{ item.id }}/object/{{ item.Object.id }}/')";>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.DateTime_add }}</td>
+                    <td class="text-center">{{ item.Object.NumObject }}</td>
+                    <td>{{ item.Object.AddressObject }}</td>
+                    <td class="text-center">{{ item.Object.Client }}</td>
+                    <td class="text-center">
+                        {% for type_secur in item.Object.TypeSecurity.all %}
+                            {{ type_secur.Name }},
+                        {% endfor %}
+                    </td>
+                    <td class="text-center">{{ item.DateTime_schedule }}</td>
+                    <td>
+                        {% for type_secur in item.CoWorkers.all %}
+                            {{ type_secur.Person_FIO|short_fio }},
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li>Создал: {{ item.Create_user|get_user_publics }}</li>
+                            <li>Обновил: {{ item.Update_user|get_user_publics }}</li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

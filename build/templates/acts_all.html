@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Список заявок{% endblock %}
+
+    {% block title_body_h1 %}Список актов монтажа{% endblock %}
+    {% block title_body_small %}<a href="/build/acts/item/">Добавить акт</a>{% endblock %}
+
+    {% block content %}
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr class="text-center">
+                        <td style="width: 5%;">№ акта</td>
+                        <td style="width: 10%;">Отчётная дата</td>
+                        <td style="width: 30%;">№ заявки и адрес</td>
+                        <td style="width: 20%;">Контрагент</td>
+                        <td style="width: 20%;">Исполнители</td>
+                        <td style="width: 15%;">Автор</td>
+                    </tr>
+                </thead>
+
+                {% for item in acts %}
+                    <tbody>
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '/build/acts/item/{{ item.id }}/';">
+                        <td class="text-center">{{ item.id }}</td>
+                        <td class="text-center">{{ item.Day_reporting }}</td>
+                        <td class="text-right">{{ item.support_request.id }} ({{ item.support_request.AddressObject }})</td>
+                        <td class="text-right">{{ item.support_request.Client }}</td>
+                        <td class="text-center">
+                            {% for cowork in item.CoWorkers.all %}
+                                {{ cowork.Person_FIO|short_fio }},
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <ul class="list-unstyled">
+                                <li>Создал: {{ item.Create_user|get_user_publics }}</li>
+                                <li>Обновил: {{ item.Update_user|get_user_publics }}</li>
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+
+    {% endblock %}
+
+    {% block pagination %}
+        <div class="row">
+            <div class="col-xs-4" style="margin-top: 20px;">
+                <p class="all-paginate">
+                    <i>Страница {{ acts.number }} из {{ acts.paginator.num_pages }}.</i>
+                </p>
+            </div>
+            <div class="col-xs-8">
+                <ul class="pagination pagination">
+                    <ul class="pagination" style="margin-top:5px;">
+                        <li {% if not acts.has_previous %}class="disabled"{% endif %}>
+                            <a {% if acts.has_previous %}href="/build/acts/page/{{ acts.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
+                        </li>
+                        <li><a href="/build/acts/page/1/">Первая</a></li>
+                        {% for page in page_range %}
+                            {% ifequal page objects.number %}
+                                <li class="active">
+                                    <a>{{ acts.number }}<span class="sr-only">(текущая)</span></a>
+                                </li>
+                            {% else %}
+                                <li><a href="/build/acts/page/{{ page }}/">{{ page }}</a></li>
+                            {% endifequal %}
+                        {% endfor %}
+                        <li><a href="/build/acts/page/{{ acts.paginator.num_pages }}/">Последняя</a></li>
+                        <li {% if not objects.has_next %}class="disabled"{% endif %}>
+                            <a {% if objects.has_next %}href="/build/acts/page/{{ acts.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
+                        </li>
+                    </ul>
+                </ul>
+            </div>
+        </div>
+    {% endblock %}

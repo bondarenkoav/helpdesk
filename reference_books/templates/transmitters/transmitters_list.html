@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+
+{% block title %}Список исполнителей{% endblock %}
+
+    {% block title_body_h1 %}Список моделей передатчиков{% endblock %}
+    {% block title_body_small %}<a href="/reference_books/transmitters/item/">Добавить модель</a>{% endblock %}
+
+    {% block content %}
+    <div class="container">
+        <div class="table-responsive">
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <td style="width: 10%;">№ п/п</td>
+                        <td style="width: 40%;">Модель передатчика</td>
+                        <td style="width: 50%;">Наименование ПЦН</td>
+                    </tr>
+                </thead>
+
+                {% for item in list_transmitters %}
+                    <tbody>
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '/reference_books/transmitters/item/{{ item.id }}/';">
+                            <td>{{ forloop.counter }}</td>
+                            <td>{{ item.Name }}</td>
+                            <td>{{ item.SystemPCN }}</td>
+                        </tr>
+                    </tbody>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+    {% endblock %}

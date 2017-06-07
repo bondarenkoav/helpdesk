@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load bootstrap3 %}
+
+    {% block title %}Заявка на {{ filter }}{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block title_body_h1 %}Список заявок{% endblock %}
+    {% block title_body_small %}с выбором месяца ТО{% endblock %}
+
+    {% block content %}
+        <div class="container panel panel-default noprint">
+            <div class="panel-body">
+                <form action="/maintenance/objects_change_month/" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-10">
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-2">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary text-center">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr class="text-center">
+                            <td style="width: 10%;">№ п/п</td>
+                            <td style="width: 25%;">Адрес объекта</td>
+                            <td style="width: 20%;">Контрагент</td>
+                            <td style="width: 15%;">Тип сигнализации</td>
+                            <td style="width: 20%;">Месяц обслуживания</td>
+                            <td style="width: 10%;">Состояние</td>
+                        </tr>
+                    </thead>
+
+                    {% for item in objects %}
+                        <tbody>
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '/maintenance/objects/item/{{ item.id }}/';">
+                            <td class="text-center">{{ forloop.counter }}</td>
+                            <td>{{ item.NumObject }}({{ item.AddressObject }})</td>
+                            <td class="text-right">{{ item.Client }}</td>
+                            <td class="text-center">
+                                {% for type in item.TypeSecurity.all %}
+                                    {{ type.Name }},
+                                {% endfor %}</td>
+                            <td class="text-center">
+                                {% for month in item.Month_schedule.all %}
+                                    {{ month.Month_num }},
+                                {% endfor %}
+                            </td>
+                            <td class="text-center">{{ item.Status }}</td>
+                        </tr>
+                        </tbody>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% endblock %}
