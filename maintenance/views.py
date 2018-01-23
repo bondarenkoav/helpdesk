@@ -31,7 +31,7 @@ def get_requests_maintenance(request,status='open',page_id=1):
 
             if form.is_valid():
                 objects = objects_to.objects.filter(ServingCompany=user_company,AddressObject__icontains=str_address)
-                args['requests'] = maintenance_request.objects.filter(Object=objects,Status=status_query,DateTime_schedule__month=change_month)
+                args['requests'] = maintenance_request.objects.filter(Object=objects, Status=status_query, DateTime_schedule__month=change_month, DateTime_schedule__year=datetime.datetime.today().year) #,DateTime_schedule__year=int(datetime.datetime.year))
 
         args['status'] = Status.objects.get(slug=status)
         args['form'] = request_status_filter
@@ -150,17 +150,18 @@ def get_requestTO_change_month(request):
         status_request = Status.objects.get(slug='open').id
 
         if request.POST and form.is_valid():
-            change_month = request.POST['month_list']
+            change_month = int(request.POST['month_list'])
             routes = request.POST['routs']
             user_company = ExpandedUserProfile.objects.get(UserName=request.user.id).ServingCompany
 
             if change_month != '':
                 if routes != '':
-                    list_objects = objects_to.objects.filter(ServingCompany=user_company,Month_schedule=change_month,Routes=routes,Status=status_object)
-                    args['trouble_shooting'] = trouble_shooting.objects.filter(Status=status_request,Routes=routes)
+                    list_objects = objects_to.objects.filter(ServingCompany=user_company,Routes=routes,Status=status_object) # Month_schedule=change_month
+                    args['trouble_shooting'] = trouble_shooting.objects.filter(Status=status_request,Routes=routes) # DateTime_add__year=datetime.datetime.today().year
                 else:
-                    list_objects = objects_to.objects.filter(ServingCompany=user_company,Month_schedule=change_month,Status=status_object)
-                args['requests'] = maintenance_request.objects.filter(Status=status_request,Object=list_objects)
+                    list_objects = objects_to.objects.filter(ServingCompany=user_company,Status=status_object)
+                
+                args['requests'] = maintenance_request.objects.filter(Object=list_objects,DateTime_add__month=change_month,DateTime_add__year=datetime.datetime.today().year)
 
         args['form'] = form
         return render_to_response('objects/objects_per_month.html', args, context_instance=RequestContext(request, processors=[custom_proc]))

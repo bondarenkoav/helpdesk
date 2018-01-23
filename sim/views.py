@@ -11,6 +11,17 @@ from sim.forms import get_new_simcard
 from sim.models import OpSoS_card, UseTypeSIM
 
 
+def clean_phone(phone):
+    phone_clean = phone.replace(' ', '')
+    phone_clean = phone_clean.replace('(', '')
+    phone_clean = phone_clean.replace(')', '')
+    phone_clean = phone_clean.replace('-', '')
+    phone_clean = phone_clean.replace('+7', '')
+    return phone_clean
+
+def clean_iccsim(icc_sim):
+    return icc_sim.replace(' ', '')
+
 def get_simcard_list(request,status='active',page_id=1):
     args = {}
 
@@ -50,6 +61,8 @@ def get_new_simcard_item(request, simcard_id=None):
                     logging_event(Event.objects.get(slug='change_notation'), request.user, old_data.Notation, 'sim')
 
                 if usetype_slug=='usesim_object':
+                    if old_data.Use_nameobject != request.POST['Use_nameobject']:
+                        logging_event(Event.objects.get(slug='change_use_nameobject'), request.user, old_data.Use_nameobject, 'sim')
                     if old_data.Use_numberobject != request.POST['Use_numberobject']:
                         logging_event(Event.objects.get(slug='change_use_numberobject'), request.user, old_data.Use_numberobject, 'sim')
                     if old_data.Use_addressobject != request.POST['Use_addressobject']:
@@ -62,6 +75,10 @@ def get_new_simcard_item(request, simcard_id=None):
                 logging_event(Event.objects.get(slug='add_simcard'), request.user, '','sim')
 
             item = formset.save(commit=False)
+            if request.POST['Number_SIM']:
+                item.Number_SIM = clean_phone(request.POST['Number_SIM'])
+            if request.POST['ICC_SIM']:
+                item.ICC_SIM = clean_iccsim(request.POST['ICC_SIM'])
             if simcard_id==None:
                 item.Create_user = request.user.id
             else:

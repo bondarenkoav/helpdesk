@@ -12,8 +12,8 @@
             <h1 class="form-signin-heading" style="text-align: center">Вход в АРМ "Заявки"</h1>
             {% csrf_token %}
             <div class="row">
-                <div class="col-xs-7 col-xs-offset-2">
-                    {% bootstrap_form form layout='inline' %}
+                <div class="col-xs-8 col-xs-offset-1">
+                    {% bootstrap_form form layout='horizontal' %}
                 </div>
                 <div class="col-xs-3">
                     {% buttons %}

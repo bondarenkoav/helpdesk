@@ -3,18 +3,14 @@
 
 {% block title %}Список исполнителей{% endblock %}
 
-    {% block dop_link %}
-        <li></li>
-    {% endblock %}
+{% block dop_link %}
+    <li></li>
+{% endblock %}
 
-    {% block title_body_h1 %}Список исполнителей{% endblock %}
-    {% block title_body_small %}<a href="/reference_books/coworker/item/">Добавить исполнителя</a>{% endblock %}
+{% block title_body_h1 %}Список исполнителей{% endblock %}
+{% block title_body_small %}<a href="/reference_books/coworker/item/">Добавить исполнителя</a>{% endblock %}
 
-    {% block title_body %}
-
-    {% endblock %}
-
-    {% block content %}
+{% block content %}
     <div class="container">
         <div class="table-responsive">
             <table class="table table-hover">
@@ -52,30 +48,30 @@
             </table>
         </div>
     </div>
-    {% endblock %}
+{% endblock %}
 
-    {% block pagination %}
-
-        <ul class="pagination pagination">
-            {% if co_worker.has_previous %}
-                <li><a href="/reference_books/coworker/page/{{ co_worker.previous_page_number }}/">&laquo;</a></li>
-            {% else %}
-                <li class="disabled"><a href="">&laquo;</a></li>
+{% block pagination %}
+    <ul class="pagination">
+        {% if co_worker.has_previous == True %}
+            <li><a href="/reference_books/coworker/page/{{ co_worker.previous_page_number }}/">&laquo;</a></li>
+            <li><a href="/reference_books/coworker/page/1/">1</a></li>
+            <li class="disabled"><a href="#">...</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        {% endif %}
+        {% for page in co_worker.paginator.page_range %}
+            {% if page == co_worker.number %}
+                <li class="active">
+                    <a>{{ co_worker.number }}<span class="sr-only">(текущая)</span></a>
+                </li>
             {% endif %}
-
-            {% for page in co_worker.paginator.page_range %}
-                {% if page == co_worker.value %}
-                    <li class="active"><a href="/reference_books/coworker/page/{{ page }}/">{{ page }}</a></li>
-                {% else %}
-                    <li><a href="/reference_books/coworker/page/{{ page }}/">{{ page }}</a></li>
-                {% endif %}
-            {% endfor %}
-
-            {% if co_worker.has_next %}
-                <li><a href="/reference_books/coworker/page/{{ co_worker.next_page_number }}/">&raquo;</a></li>
-            {% else %}
-                <li class="disabled"><a href="">&raquo;</a></li>
-            {% endif %}
-        </ul>
-
-    {% endblock %}
+        {% endfor %}
+        {% if co_worker.has_next == True %}
+            <li class="disabled"><a href="#">...</a></li>
+            <li><a href="/reference_books/coworker/page/{{ co_worker.paginator.num_pages }}/">{{ co_worker.paginator.num_pages }}</a></li>
+            <li><a href="/reference_books/coworker/page/{{ co_worker.next_page_number }}/">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}

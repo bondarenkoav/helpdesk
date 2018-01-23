@@ -10,16 +10,37 @@ from django.utils.safestring import mark_safe
 __author__ = 'ipman'
 
 def cron_close_maintenance_object():            # Автоматическое снятие объектов с ТО
+    now_date = datetime.date.today()
+    objects_to.objects.filter(Date_close__lt=now_date,Status=Status_object.objects.get(slug='open')).update(Status=Status_object.objects.get(slug='close'))
+    return HttpResponseRedirect('/')
+
+def cron_create_maintenance_request():           # Создаёт заявки 1 числа каждого месяца
 
     now_date = datetime.date.today()
     cur_month = now_date.month
-    status_open = Status.objects.get(slug='open').id
+    status_open = Status_object.objects.get(slug='open').id
+    get_objects_cur_month = objects_to.objects.filter(Month_schedule=cur_month, Status=status_open)
 
-    objects_to.objects.filter(Date_close__lt=now_date,Status=status_open).update(Status=2)
+    for object in get_objects_cur_month:
+        object_id = objects_to.objects.get(id=object.id)
+        type_list = ''
+        for type in object.TypeSecurity.all():
+            if type_list == '':
+                type_list = type.__str__()
+            else:
+                type_list = type_list+', '+type.__str__()
 
-#    return HttpResponseRedirect('/')
+        p = maintenance_request(
+            Object            = object_id,
+            TypeSecurity      = type_list,
+            Create_user       = object.Create_user,
+            DateTime_schedule = now_date
+        )
+        p.save(force_insert=True)
 
-def cron_create_maintenance_request(request):           # Создаёт заявки 1 числа каждого месяца
+    return HttpResponseRedirect('/')
+
+def cron_create_maintenance_request_manual(request):  # Создаёт заявки 1 числа каждого месяца
 
     now_date = datetime.date.today()
     cur_month = now_date.month

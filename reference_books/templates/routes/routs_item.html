@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load bootstrap3 %}
+{% load get_user_publics %}
 
 {% block title_body_h1 %}Список моделей передатчиков{% endblock %}
 
@@ -20,6 +21,20 @@
                 </form>
 
             </div>
+        </div>
+        <div>
+            {% for number,name in months %}
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">{{ name }}</h3>
+                    </div>
+                    <div class="panel-body">
+                        <ul>
+                            {% get_objects_to_curmonth number routes_id %}
+                        </ul>
+                    </div>
+                </div>
+            {% endfor %}
         </div>
     </div>
 

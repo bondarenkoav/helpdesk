@@ -2,6 +2,7 @@
 {% load mptt_tags %}
 {% load admin_static %}
 
+{% spaceless %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -32,6 +33,7 @@
         <script type="text/javascript" src="{% static "static/js/DateTimeShortcuts.js" %}"></script>
         <script type="text/javascript" src="{% static "static/js/jquery.suggestions-15.12.min.js" %}"></script>
         <script type="text/javascript" src="{% static "static/js/jquery.init.js" %}"></script>
+        <script type="text/javascript" src="{% static 'static/js/jquery.inputmask.js' %}"></script>
 
         <style type="text/css" media="all">
             .chosen-rtl .chosen-drop { left: -9000px; }
@@ -59,7 +61,9 @@
             }
             function hideInputTypeUseSIM(a){
                 var label = a.value;
-                if(label==1){
+                if(label==2){
+                    document.getElementById('id_Use_nameobject').disabled='';
+                    document.getElementById('id_Use_nameobject').required=true;
                     document.getElementById('id_Use_numberobject').disabled='';
                     document.getElementById('id_Use_numberobject').required=true;
                     document.getElementById('id_Use_addressobject').disabled='';
@@ -67,7 +71,9 @@
                     document.getElementById('id_Use_user').disabled='disabled';
                     document.getElementById('id_Use_user').required=false;
                 }
-                else if(label==2){
+                else if(label==1){
+                    document.getElementById('id_Use_nameobject').disabled='disabled';
+                    document.getElementById('id_Use_nameobject').required=false;
                     document.getElementById('id_Use_numberobject').disabled='disabled';
                     document.getElementById('id_Use_numberobject').required=false;
                     document.getElementById('id_Use_addressobject').disabled='disabled';
@@ -76,6 +82,8 @@
                     document.getElementById('id_Use_user').required=true;
                 }
                 else{
+                    document.getElementById('id_Use_nameobject').disabled='disabled';
+                    document.getElementById('id_Use_nameobject').required=false;
                     document.getElementById('id_Use_numberobject').disabled='disabled';
                     document.getElementById('id_Use_numberobject').required=false;
                     document.getElementById('id_Use_addressobject').disabled='disabled';
@@ -84,6 +92,10 @@
                     document.getElementById('id_Use_user').required=false;
                 }
             }
+            $(document).ready(function(){
+                $("#phone_mobile").inputmask('+7 (999) 999-99-99');
+                $("#id_sim").inputmask('9999999 999 999 9999 9');
+            });
         </script>
 
         <title>{% block title %}{% endblock %} - АРМ "Заявки"</title>
@@ -206,3 +218,4 @@
 
   </body>
 </html>
+{% endspaceless %}

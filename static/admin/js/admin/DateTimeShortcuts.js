@@ -213,7 +213,7 @@ var DateTimeShortcuts = {
         inp.parentNode.insertBefore(shortcuts_span, inp.nextSibling);
         var today_link = document.createElement('a');
         today_link.setAttribute('href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
-        //today_link.appendChild(document.createTextNode(gettext('Today')));
+        today_link.appendChild(document.createTextNode(gettext('Today')));
         var cal_link = document.createElement('a');
         cal_link.setAttribute('href', 'javascript:DateTimeShortcuts.openCalendar(' + num + ');');
         cal_link.id = DateTimeShortcuts.calendarLinkName + num;
@@ -262,13 +262,13 @@ var DateTimeShortcuts = {
         DateTimeShortcuts.calendars[num].drawCurrent();
 
         // calendar shortcuts
-        //var shortcuts = quickElement('div', cal_box);
-        //shortcuts.className = 'calendar-shortcuts';
-        //quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
-        //shortcuts.appendChild(document.createTextNode('\240|\240'));
-        //quickElement('a', shortcuts, gettext('Today'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
-        //shortcuts.appendChild(document.createTextNode('\240|\240'));
-        //quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
+        var shortcuts = quickElement('div', cal_box);
+        shortcuts.className = 'calendar-shortcuts';
+        quickElement('a', shortcuts, gettext('Yesterday'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', -1);');
+        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        quickElement('a', shortcuts, gettext('Today'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', 0);');
+        shortcuts.appendChild(document.createTextNode('\240|\240'));
+        quickElement('a', shortcuts, gettext('Tomorrow'), 'href', 'javascript:DateTimeShortcuts.handleCalendarQuickLink(' + num + ', +1);');
 
         // cancel bar
         var cancel_p = quickElement('p', cal_box);

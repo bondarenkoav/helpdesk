@@ -1,5 +1,5 @@
 from django.db import models
-from reference_books.models import Company, OpSoS_name, OpSoS_rate
+from reference_books.models import Company, OpSoS_name, OpSoS_rate, SystemPCN
 
 
 class UseTypeSIM(models.Model):
@@ -14,13 +14,15 @@ class UseTypeSIM(models.Model):
 
 class OpSoS_card(models.Model):
     OpSoSRate           = models.ForeignKey(OpSoS_rate,verbose_name='Тариф',max_length=100)
-    Number_SIM          = models.BigIntegerField(u'Номер сим-карты')
-    ICC_SIM             = models.CharField(u'Ид.код сим-карты', max_length=20)
+    Number_SIM          = models.CharField(u'Номер сим-карты', max_length=20)
+    ICC_SIM             = models.CharField(u'Ид.код сим-карты', max_length=22)
     Contract            = models.CharField(u'Договор', max_length=100)
     Owner               = models.ForeignKey(Company, verbose_name='Контрагент оператора')
     Contract_date       = models.DateField(u'Дата')
     PersonalAccount     = models.IntegerField(u'Лицевой счёт')
     Use_type            = models.ForeignKey(UseTypeSIM, verbose_name='Тип применения')
+    SystemPCN           = models.ForeignKey(SystemPCN, verbose_name='ПЦН')
+    Use_nameobject      = models.CharField(u'Наименование объекта',max_length=300, blank=True)
     Use_numberobject    = models.CharField(u'Номер объекта',max_length=30, blank=True)
     Use_addressobject   = models.CharField(u'Адрес объекта',max_length=300, blank=True)
     Use_user            = models.CharField(u'Фамилия Имя Отчество', max_length=100, blank=True)

@@ -5,6 +5,7 @@ from maintenance.models import  objects_to, maintenance_request # Status_object,
 
 class MaintenanceRequestAdmin(admin.ModelAdmin):
     list_display = ['Object','DateTime_schedule','DateTime_work','Status','DateTime_add']
+    list_filter = ['DateTime_schedule','DateTime_work','Status']
 
 class Status_objectAdmin(admin.ModelAdmin):
     list_display = ['Name','slug']

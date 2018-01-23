@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^clients/item/(?P<client_id>\d+)/$', 'reference_books.views.get_new_save_clients_item'),
     url(r'^clients/item/None/$', 'reference_books.views.get_new_save_clients_item'),
     url(r'^clients/item/$', 'reference_books.views.get_new_save_clients_item'),
+    url(r'^clients/page/(?P<page_id>\d+)/$', 'reference_books.views.get_clients'),
     url(r'^clients/$', 'reference_books.views.get_clients'),
 
     url(r'^coworker/item/(?P<coworker_id>\d+)/$', 'reference_books.views.get_new_save_coworker_item'),

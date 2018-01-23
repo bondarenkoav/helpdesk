@@ -50,34 +50,27 @@
 {% endblock %}
 
 {% block pagination %}
-    <div class="row">
-        <div class="col-xs-4" style="margin-top: 7px;">
-            <p class="all-paginate">
-                <i>Страница {{ simcards.number }} из {{ simcards.paginator.num_pages }}.</i>
-            </p>
-        </div>
-        <div class="col-xs-8">
-            <ul class="pagination pagination">
-                <ul class="pagination" style="margin-top:5px;">
-                    <li {% if not simcards.has_previous %}class="disabled"{% endif %}>
-                        <a {% if simcards.has_previous %}href="/simcard//{{ status.slug }}/page/{{ simcards.previous_page_number }}/" aria-label="Previous" {% endif %}><span aria-hidden="true">&laquo;&nbsp;Предыдущая</span></a>
-                    </li>
-                    <li><a href="/simcard/{{ status.slug }}/page/1/">Первая</a></li>
-                    {% for page in page_range %}
-                        {% ifequal page simcards.number %}
-                            <li class="active">
-                                <a>{{ simcards.number }}<span class="sr-only">(текущая)</span></a>
-                            </li>
-                        {% else %}
-                            <li><a href="/simcard/{{ status.slug }}/page/{{ page }}/">{{ page }}</a></li>
-                        {% endifequal %}
-                    {% endfor %}
-                    <li><a href="/simcard/{{ status.slug }}/page/{{ simcards.paginator.num_pages }}/">Последняя</a></li>
-                    <li {% if not simcards.has_next %}class="disabled"{% endif %}>
-                        <a {% if simcards.has_next %}href="/simcard/{{ status.slug }}/page/{{ simcards.next_page_number }}/" aria-label="Next" {% endif %}><span aria-hidden="true">Следущая &nbsp;&raquo;</span></a>
-                    </li>
-                </ul>
-            </ul>
-        </div>
-    </div>
+    <ul class="pagination">
+        {% if simcards.has_previous == True %}
+            <li><a href="/simcards/{{ status.slug }}/page/{{ simcards.previous_page_number }}/">&laquo;</a></li>
+            <li><a href="/simcards/{{ status.slug }}/page/1/">1</a></li>
+            <li class="disabled"><a href="#">...</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        {% endif %}
+        {% for page in simcards.paginator.page_range %}
+            {% if page == simcards.number %}
+                <li class="active">
+                    <a>{{ simcards.number }}<span class="sr-only">(текущая)</span></a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if simcards.has_next == True %}
+            <li class="disabled"><a href="#">...</a></li>
+            <li><a href="/simcards/{{ status.slug }}/page/{{ simcards.paginator.num_pages }}/">{{ simcards.paginator.num_pages }}</a></li>
+            <li><a href="/simcards/{{ status.slug }}/page/{{ simcards.next_page_number }}/">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        {% endif %}
+    </ul>
 {% endblock %}
