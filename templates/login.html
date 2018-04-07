@@ -1,26 +1,44 @@
-{% extends "base.html" %}
-{% load staticfiles %}
-{% load bootstrap3 %}
+{% load staticfiles mptt_tags admin_static bootstrap3 %}
 
-{% block title %}
-    Меню
-{% endblock %}
+{% spaceless %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="description" content="">
+        <meta name="author" content="">
 
-{% block content %}
-    <div class="container" style="margin-top: 10%">
-        <form role="form" action="/login/" method="post">
-            <h1 class="form-signin-heading" style="text-align: center">Вход в АРМ "Заявки"</h1>
-            {% csrf_token %}
-            <div class="row">
-                <div class="col-xs-8 col-xs-offset-1">
-                    {% bootstrap_form form layout='horizontal' %}
-                </div>
-                <div class="col-xs-3">
-                    {% buttons %}
-                        <button type="submit" class="btn btn-primary btn-lg">Войти</button>
-                    {% endbuttons %}
+        <link rel="icon" href="{% static "static/img/addnew.gif" %}">
+
+        <script type="text/javascript" src="{% static "static/js/jquery.min.js" %}"></script>
+        <script type="text/javascript" src="{% static "static/js/bootstrap.min.js" %}"></script>
+        <link rel="stylesheet" href="{% static "static/css/bootstrap.min.css" %}">
+
+        <title>Авторизация - АРМ "Заявки"</title>
+    </head>
+    <body background="{% static 'static/img/helpdesk.jpg' %}">
+        {% block content %}
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-6 col-lg-offset-3 col-sm-8 col-sm-offset-2 col-xs-12 panel panel-default" style="margin-top: 10%; padding: 0%;">
+                        <div class="panel-heading"><h1 class="form-signin-heading" style="text-align: center">Вход в АРМ "Заявки"</h1></div>
+                        <form role="form" action="{% url 'login' %}" method="post">
+                            <div class="panel-body">
+                                {% csrf_token %}
+                                {% bootstrap_form form layout='horizontal' %}
+                            </div>
+                            <div class="panel-footer text-right">
+                                {% buttons %}
+                                    <button type="submit" class="btn btn-primary btn-lg">Войти</button>
+                                {% endbuttons %}
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </form>
-    </div>
-{% endblock %}
+        {% endblock %}
+    </body>
+</html>
+{% endspaceless %}

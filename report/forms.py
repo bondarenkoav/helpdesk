@@ -4,6 +4,7 @@ from django.contrib.admin.widgets import AdminDateWidget
 from django.forms import CheckboxInput
 from django.forms.extras import SelectDateWidget
 from build.models import acts_build
+from reference_books import models
 from reference_books.models import CoWorker, ExpandedUserProfile
 
 __author__ = 'ipman'
@@ -46,6 +47,7 @@ __author__ = 'ipman'
 #     class Meta:
 #         model = CoWorker
 #         fields = ['CoWorkers']
+
 
 class coworkers_range_date(forms.Form):          # Вывести: кто где работал в течении заданного периода и за один день
     acts_date_start = forms.DateField(label='Дата начала', widget=AdminDateWidget, initial=datetime.date.today)

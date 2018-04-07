@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load bootstrap3 reports_tags %}
+
+{% block title %}Заявка на {{ filter }}{% endblock %}
+{% block title_body_h1 %}Список исполнителей по объектам{% endblock %}
+{% block title_body_small %}с {{ acts_date_start }} по {{ acts_date_stop }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default noprint" style="max-width: 800px;">
+            <div class="panel-body">
+                <form action="{% url 'reports:report_coworkers_range_date' %}" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-10">
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-2">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary text-center" style="margin-top: 10px;">
+                                    Вывести
+                                </button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <hr/>
+        <div>
+            {% for coworker in coworkers %}
+                {% get_employment_coworker coworker=coworker date_start=date_start date_end=date_end %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

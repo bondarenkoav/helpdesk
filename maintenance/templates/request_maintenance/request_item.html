@@ -1,27 +1,32 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
 {% load bootstrap3 %}
 
-{% block title %}Заявка №{{ request_id }}{% endblock %}
-
-{% block title_body %}
-
-{% endblock %}
-
-{% block title_body_h1 %}Заявка №{{ request_id }}{% endblock %}
-{% block title_body_small %}
-    {% if request_id != None %}
-        <a href="/maintenance/{{ object_id }}/">Добавить заявку ТО</a>
+{% block title %}Заявка ТО{% endblock %}
+{% block title_body_h1 %}
+    {% if request_data %}
+        Заявка №{{ request_data.id }}
+    {% else %}
+        Новый объект ТО
     {% endif %}
-{% endblock %}
+    Заявка №{{ request_data.id }}{% endblock %}
+{% block title_body_small %}{% endblock %}
 
 {% block content %}
     <div class="container">
-        <h3>Объект: {{ num_object }} - {{ address }} ({{ client }})</h3>
+        <h3>Объект:
+            {% if request_data %}
+                {{ request_data.Object.NumObject }} - {{ request_data.Object.AddressObject }} ({{ request_data.Object.Client.Name }})
+            {% else %}
+                {{ object_data.NumObject }} - {{ object_data.AddressObject }} ({{ object_data.Client.Name }})
+            {% endif %}
+        </h3>
         <div class="panel panel-default">
             <div class="panel-body">
-
-                <form action="/maintenance/item/{{ request_id }}/object/{{ object_id }}/" method="post" class="form">
+                {% if request_data %}
+                    <form action="{% url 'maintenance:add&get_request' request_data.Object.id request_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'maintenance:add&get_request' object_data.id %}" method="post" class="form">
+                {% endif %}
                     {% csrf_token %}
                     {% bootstrap_form form layout='horizontal' %}
                     {% buttons %}
@@ -30,7 +35,6 @@
                         </button>
                     {% endbuttons %}
                 </form>
-
             </div>
         </div>
     </div>

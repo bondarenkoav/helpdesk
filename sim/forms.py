@@ -16,20 +16,20 @@ class get_new_simcard(ModelForm):
 
         if instance and instance.id:
             data = OpSoS_card.objects.get(id=instance.id)
-            self.fields['OpSoSRate'].required = False
-            self.fields['OpSoSRate'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['OpSoSRate'].required = False
+            # self.fields['OpSoSRate'].widget.attrs['disabled'] = 'disabled'
             self.fields['Number_SIM'].required = False
             self.fields['Number_SIM'].widget.attrs['disabled'] = 'disabled'
             self.fields['ICC_SIM'].required = False
             self.fields['ICC_SIM'].widget.attrs['disabled'] = 'disabled'
-            self.fields['Owner'].required = False
-            self.fields['Owner'].widget.attrs['disabled'] = 'disabled'
-            self.fields['PersonalAccount'].required = False
-            self.fields['PersonalAccount'].widget.attrs['disabled'] = 'disabled'
-            self.fields['Contract'].required = False
-            self.fields['Contract'].widget.attrs['disabled'] = 'disabled'
-            self.fields['Contract_date'].required = False
-            self.fields['Contract_date'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['Owner'].required = False
+            # self.fields['Owner'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['PersonalAccount'].required = False
+            # self.fields['PersonalAccount'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['Contract'].required = False
+            # self.fields['Contract'].widget.attrs['disabled'] = 'disabled'
+            # self.fields['Contract_date'].required = False
+            # self.fields['Contract_date'].widget.attrs['disabled'] = 'disabled'
 
             if data.Status == False:
                 self.fields['Status'].required = False
@@ -44,15 +44,15 @@ class get_new_simcard(ModelForm):
     Use_type            = forms.ModelChoiceField(required=True, label='Тип использования', queryset = UseTypeSIM.objects.all(),
                                                  help_text='Выберите тип применения и заполните доступное поле/поля ниже',
                                                  widget=forms.Select(attrs={'class':'selector','onchange':'hideInputTypeUseSIM(this)'}))
-    Use_numberobject    = forms.CharField(required=False, label='№ объекта', widget=forms.widgets.TextInput(attrs={'disabled':'disabled'}))
-    Use_nameobject      = forms.CharField(required=False, label='Наименование объекта', widget=forms.widgets.TextInput(attrs={'disabled':'disabled'}))
-    Use_addressobject   = forms.CharField(required=False, label='Адрес объекта', widget=forms.widgets.TextInput(attrs={'disabled':'disabled'}))
-    Use_user            = forms.CharField(required=False, label='ФИО пользователя', widget=forms.widgets.TextInput(attrs={'disabled':'disabled'}))
+    Use_numberobject    = forms.CharField(required=False, label='№ объекта', widget=forms.widgets.TextInput())       #(attrs={'disabled':'disabled'}))
+    Use_nameobject      = forms.CharField(required=False, label='Наименование объекта', widget=forms.widgets.TextInput())   #(attrs={'disabled':'disabled'}))
+    Use_addressobject   = forms.CharField(required=False, label='Адрес объекта', widget=forms.widgets.TextInput())     #(attrs={'disabled':'disabled'}))
+    Use_user            = forms.CharField(required=False, label='ФИО пользователя', widget=forms.widgets.TextInput())   #(attrs={'disabled':'disabled'}))
 
     class Meta:
         model = OpSoS_card
         fields = ['OpSoSRate','Number_SIM','ICC_SIM','SystemPCN','Contract','Owner','Contract_date','PersonalAccount','Status',
-                  'Use_type','Use_numberobject','Use_nameobject','Use_addressobject','Use_user']
+                  'Use_type','Use_numberobject','Use_nameobject','Use_addressobject','Use_user','Notation']
 
     # def clean(self):
     #     cleaned_data = super(get_new_simcard, self).clean()

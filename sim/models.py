@@ -19,7 +19,7 @@ class OpSoS_card(models.Model):
     Contract            = models.CharField(u'Договор', max_length=100)
     Owner               = models.ForeignKey(Company, verbose_name='Контрагент оператора')
     Contract_date       = models.DateField(u'Дата')
-    PersonalAccount     = models.IntegerField(u'Лицевой счёт')
+    PersonalAccount     = models.CharField(u'Лицевой счёт', max_length=20)
     Use_type            = models.ForeignKey(UseTypeSIM, verbose_name='Тип применения')
     SystemPCN           = models.ForeignKey(SystemPCN, verbose_name='ПЦН')
     Use_nameobject      = models.CharField(u'Наименование объекта',max_length=300, blank=True)

@@ -1,6 +1,4 @@
-{% load staticfiles %}
-{% load mptt_tags %}
-{% load admin_static %}
+{% load staticfiles mptt_tags admin_static %}
 
 {% spaceless %}
 <!DOCTYPE html>
@@ -35,8 +33,15 @@
         <script type="text/javascript" src="{% static "static/js/jquery.init.js" %}"></script>
         <script type="text/javascript" src="{% static 'static/js/jquery.inputmask.js' %}"></script>
 
+        <!-- DataTables -->
+        <link rel="stylesheet" href="{% static "static/css/dataTables.bootstrap.min.css" %}">
+        <script type="text/javascript" src="{% static "static/js/jquery.dataTables.min.js" %}"></script>
+        <script type="text/javascript" src="{% static 'static/js/dataTables.bootstrap.min.js' %}"></script>
+
         <style type="text/css" media="all">
-            .chosen-rtl .chosen-drop { left: -9000px; }
+            .chosen-rtl .chosen-drop {left: -9000px;}
+            .divsortTable {margin-top: 0px; margin-bottom: 50px;}
+            .form-marginup {margin-top: -30px;}
         </style>
         <!-- Custom styles for this template -->
         <link href="{% static "static/css/blog.css" %}" rel="stylesheet">
@@ -95,6 +100,13 @@
             $(document).ready(function(){
                 $("#phone_mobile").inputmask('+7 (999) 999-99-99');
                 $("#id_sim").inputmask('9999999 999 999 9999 9');
+                $('#sortTable').DataTable({
+                        paging: false,
+                        search: true,
+                        //ordering: true,
+                        aaSorting: [],
+                        order: []
+                    });
             });
         </script>
 
@@ -150,13 +162,13 @@
                           {% if user.is_authenticated %}
                               <li>
                                   <p class="navbar-text">{{ user.first_name }} {{ user.last_name }}
-                                      <a href="/logout/"> Выход</a>
+                                      <a href="{% url 'logout' %}"> Выход</a>
                                   </p>
                               </li>
                           {% else %}
                               <li>
                                   <p class="navbar-text">Вы не авторизованы
-                                      <a href="/login/"> Вход</a>
+                                      <a href="{% url 'login' %}"> Вход</a>
                                   </p>
                               </li>
                           {% endif %}
@@ -175,23 +187,25 @@
           </div>
       </div>
 
-      <div style="padding: 15px 0 20px 0">
+      <div>
           {% block content %}{% endblock %}
       </div><!-- /.container -->
 
       <nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
           <div class="row">
-              <div class="col-xs-4 text" style="margin-top: 10px; padding-left: 30px;">
-                  Разработано <abbr title="{{ developer_name }}">{{ developer_email }}</abbr> для <strong>{{ owner }}</strong>
-              </div>
-              <div class="col-xs-6 text-center">
-                  <div class="text-center">
-                      {% block pagination %}{% endblock %}
+              {% if user.is_authenticated %}
+                  <div class="col-xs-4 text" style="margin-top: 10px; padding-left: 30px;">
+                      Разработано <abbr title="{{ developer_name }}">{{ developer_email }}</abbr> для <strong>{{ owner }}</strong>
                   </div>
-              </div>
-              <div class="col-xs-2 text-center" style="margin-top: 10px;">
-                  <a href="#">Вернутся наверх ^</a>
-              </div>
+                  <div class="col-xs-6 text-center" style="padding-top: 5px;">
+                      <div class="text-center">
+                          {% block pagination %}{% endblock %}
+                      </div>
+                  </div>
+                  <div class="col-xs-2 text-center" style="margin-top: 10px;">
+                      <a href="#">Вернутся наверх ^</a>
+                  </div>
+              {% endif %}
           </div>
       </nav>
       <!-- Bootstrap core JavaScript
@@ -215,7 +229,6 @@
               $(selector).chosen(config[selector]);
           }
       </script>
-
   </body>
 </html>
 {% endspaceless %}

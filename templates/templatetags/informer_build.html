@@ -1,0 +1,23 @@
+<div class="panel panel-warning">
+    <div class="panel-heading">
+        <h2 class="h1" style="color: brown;">Монтаж</h2>
+        <dl class="dl-horizontal">
+            <dt>В ожидании</dt><dd>request_open </dd>
+            <dt>Назначено</dt><dd>request_work </dd>
+            <dt>Под контролем</dt><dd>request_control </dd>
+        </dl>
+    </div>
+    <a href="#">
+        <div class="panel-footer">
+            <span class="pull-left">
+                <ul class="list-inline">
+                    <li><a href="{% url 'build:get_requests' 'open' %}" class="card-link">Принятые</a></li>
+                    <li><a href="{% url 'build:get_requests' 'control' %}" class="card-link">Контроль</a></li>
+                    <li><a href="{% url 'build:get_requests' 'complete' %}" class="card-link">Исполненые</a></li>
+                </ul>
+            </span>
+            <span class="pull-right"><i class="fa fa-arrow-circle-right"></i></span>
+            <div class="clearfix"></div>
+        </div>
+    </a>
+</div>

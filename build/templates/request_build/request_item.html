@@ -1,28 +1,34 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
 {% load bootstrap3 %}
 {% load short_fio %}
 
-{% block title %}Заявка №{{ request_id }}{% endblock %}
-
-{% block title_body %}
-
+{% block title %}
+    Заявка на монтаж
 {% endblock %}
-
-{% block title_body_h1 %}Заявка №{{ request_id }}{% endblock %}
+{% block title_body_h1 %}
+    Заявка
+    {% if request_data %}
+        №{{ request_data.id }}
+    {% else %}
+        новая
+    {% endif %}
+{% endblock %}
 {% block title_body_small %}
-    {% if status != "complete" and status != "canceled" and request_id != None %}
-        <a href="/build/{{ request_id }}/acts/item/None/">Добавить акт</a>
+    {% if request_data.Status.slug != "complete" and request_data.Status.slug != "canceled" and request_data.id != None %}
+        <a href="{% url 'build:add&get_act' request_data.id %}">Добавить акт</a>
     {% endif %}
 {% endblock %}
 
 {% block content %}
-
     <div class="container">
+
         <div class="panel panel-default">
             <div class="panel-body">
-
-                <form action="/build/item/{{ request_id }}/" method="post" class="form">
+                {% if request_data %}
+                    <form action="{% url 'build:add&get_request' request_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'build:add&get_request' %}" method="post" class="form">
+                {% endif %}
                     {% csrf_token %}
                     {% bootstrap_form form layout='horizontal' %}
                     {% buttons %}
@@ -31,13 +37,12 @@
                         </button>
                     {% endbuttons %}
                 </form>
-
             </div>
         </div>
 
         <div class="list-group">
             {% for item in list_acts %}
-                <a href="/build/{{ request_id }}/acts/item/{{ item.id }}/" class="list-group-item">
+                <a href="{% url 'build:add&get_act' request_data.id item.id %}" class="list-group-item">
                     <span class="lead">{{ forloop.counter }}.</span> Акт №{{ item.id }} от {{ item.Day_reporting }}:
                     {% for cowork in item.CoWorkers.all %}
                         {{ cowork.Person_FIO|short_fio }},
@@ -47,5 +52,4 @@
         </div>
 
     </div>
-
 {% endblock %}

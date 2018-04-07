@@ -1,15 +1,16 @@
 from django.db import models
-
-# Create your models here.
 from reference_books.models import Client, TypeSecurity, Month_list, Company, CoWorker, ModelTransmitter, Status
+
 
 class TypeRequest_build(models.Model):
     Name = models.CharField(u'Наименование', max_length=100)
     slug = models.SlugField(u'Ключ статуса', unique=True)
+
     def __str__(self):  return self.Name
     class Meta:
         verbose_name = u'Тип заявки '
         verbose_name_plural = u'Типы заявок '
+
 
 class build_request(models.Model):
     Client              = models.ForeignKey(Client, verbose_name='Контрагент', max_length=100)
@@ -27,10 +28,12 @@ class build_request(models.Model):
     model_transmitter   = models.ForeignKey(ModelTransmitter, verbose_name='Модель передатчика', null=True, blank=True)
     num_transmitter     = models.CharField(u'Номер передатчика', max_length=15, null=True, blank=True)
     Status              = models.ForeignKey(Status, verbose_name='Статус заявки', default=2)
+
     def __str__(self):  return self.AddressObject
     class Meta:
         verbose_name = u'Заявка '
         verbose_name_plural = u'Список заявок '
+
 
 class acts_build(models.Model):
     Name                = models.CharField(max_length=10,default='Акт')
@@ -42,6 +45,7 @@ class acts_build(models.Model):
     DateTime_update     = models.DateTimeField(u'Дата обновления', auto_now=True)
     Create_user         = models.IntegerField(u'ID пользователя создавшего заявку')
     Update_user         = models.IntegerField(u'ID пользователя закрывшего заявку', null=True, blank=True)
+
     def __str__(self):  return self.Name
     class Meta:
         verbose_name = u'Акт '

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Акт{% endblock %}
+{% block title_body_h1 %}
+    Акт
+    {% if act_data %}
+        №{{ act_data.id }}
+    {% else %}
+        новый
+    {% endif %}
+{% endblock %}
+{% block title_body_small %}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% if act_data %}
+                    <form action="{% url 'build:add&get_act' act_data.build_request.id act_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'build:add&get_act' request_data.id %}" method="post" class="form">
+                {% endif %}
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary btn-lg text-center" style="margin-top: 10px;">
+                            Сохранить
+                        </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

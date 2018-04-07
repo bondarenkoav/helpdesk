@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Заявка на {{ filter }}{% endblock %}
+{% block title_body_h1 %}Список заявок{% endblock %}
+{% block title_body_small %}с выбором месяца ТО{% endblock %}
+
+{% block content %}
+    <div class="container panel panel-default noprint">
+        <div class="panel-body">
+            <form action="{% url 'maintenance:get_requests_change_month' %}" method="post" class="form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-10">
+                        {% bootstrap_form form layout='horizontal' %}
+                    </div>
+                    <div class="col-xs-2">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary text-center">Вывести</button>
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <h2 class="text-center">Заявки</h2>
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 5%;">№ п/п</td>
+                <td style="width: 10%;">№ заявки</td>
+                <td style="width: 14%;">Дата/время добавления</td>
+                <td style="width: 10%;">№ объекта</td>
+                <td style="width: 25%;">Адрес объекта</td>
+                <td style="width: 18%;">Контрагент</td>
+                <td style="width: 13%;">Объём работ</td>
+                <td style="width: 5%;">Исполнено</td>
+            </tr>
+            </thead>
+            {% for item in requests %}
+                <tbody>
+                <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'maintenance:add&get_request' item.Object.id item.id %}')";>
+                    <td class="text-center">{{ forloop.counter }}</td>
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.DateTime_add }}</td>
+                    <td class="text-center">{{ item.Object.NumObject }}</td>
+                    <td>{{ item.Object.AddressObject }}</td>
+                    <td class="text-center">{{ item.Object.Client }}</td>
+                    <td class="text-center">
+                        {% for type_secur in item.Object.TypeSecurity.all %}
+                            {{ type_secur.Name }},
+                        {% endfor %}
+                    </td>
+                    <td class="text-center">{% if item.Status.slug == 'complete' %}ДА{% else %}НЕТ{% endif %}</td>
+                </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+        <h2 class="text-center">Неисправности</h2>
+        <table class="table">
+            <thead>
+            <tr class="text-center">
+                <td style="width: 5%;">№ заявки</td>
+                <td style="width: 10%;">Дата/время добавления</td>
+                <td style="width: 5%;">№ объекта</td>
+                <td style="width: 15%;">Адрес объекта</td>
+                <td style="width: 15%;">Контрагент</td>
+                <td style="width: 15%;">Вид неисправности</td>
+                <td style="width: 10%;">Запланировано</td>
+                <td style="width: 10%;">Исполнитель</td>
+                <td style="width: 15%;">Автор</td>
+            </tr>
+            </thead>
+            {% for item in trouble_shooting %}
+                <tbody>
+                <tr id="obj_{{ item.id }}" target="_self" onclick="location.href = '{% url 'maintenance:add&get_trouble_request' item.id  %}';">
+                    <td class="text-center">{{ item.id }}</td>
+                    <td class="text-center">{{ item.DateTime_add }}</td>
+                    <td class="text-center">{{ item.NumObject }}</td>
+                    <td>{{ item.AddressObject }}</td>
+                    <td>{{ item.Client }}</td>
+                    <td>{{ item.FaultAppearance }}</td>
+                    <td class="text-center">{{ item.DateTime_schedule }}</td>
+                    <td>
+                        {% for cowork in item.CoWorkers.all %}
+                            {{ cowork.Person_FIO|short_fio }},
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <ul class="list-unstyled">
+                            <li>Создал: {{ item.Create_user|get_user_publics }}</li>
+                            <li>Обновил: {{ item.Update_user|get_user_publics }}</li>
+                        </ul>
+                    </td>
+                </tr>
+                </tbody>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

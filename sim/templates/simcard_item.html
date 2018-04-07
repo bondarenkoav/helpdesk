@@ -1,23 +1,19 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
 {% load bootstrap3 %}
 
-{% block title %}Заявка №{{ request_id }}{% endblock %}
-
-{% block title_body %}
-
-{% endblock %}
-
+{% block title %}SIM-карта №{{ simcard_data.id }}{% endblock %}
 {% block title_body_h1 %}SIM-карта{% endblock %}
-{% block title_body_small %}№п/п {{ simcard_id }}{% endblock %}
+{% block title_body_small %}№п/п {{ simcard_data.id }}{% endblock %}
 
 {% block content %}
-
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-body">
-
-                <form action="/simcard/item/{{ simcard_id }}/" method="post" class="form">
+                {% if simcard_data %}
+                    <form action="{% url 'simmanage:add&get_simcard' simcard_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'simmanage:add&get_simcard' %}" method="post" class="form">
+                {% endif %}
                     {% csrf_token %}
                     {% bootstrap_form form layout='horizontal' %}
                     {% buttons %}
@@ -26,9 +22,7 @@
                         </button>
                     {% endbuttons %}
                 </form>
-
             </div>
         </div>
     </div>
-
 {% endblock %}

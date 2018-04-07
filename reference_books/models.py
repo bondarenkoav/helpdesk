@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from django.db import models
 
 
+
 class City(models.Model):
     Name    = models.CharField(u'Город',max_length=100)
     slug    = models.SlugField(u'алиас')
@@ -175,7 +176,7 @@ class OpSoS_name(models.Model):
 class OpSoS_rate(models.Model):
     OpSoSName = models.ForeignKey(OpSoS_name, verbose_name='Сотовый оператор')
     Rate      = models.CharField(u'Наименование', max_length=100, unique=True)
-    price     = models.DecimalField(u'Абонентская плата', max_digits=5, decimal_places=2, default=0)
+    price     = models.DecimalField(u'Абонентская плата', max_digits=6, decimal_places=2, default=0)
     Descript  = models.TextField(u'Описание тарифа')
 
     def __str__(self):  return  str(self.OpSoSName)+' - '+self.Rate

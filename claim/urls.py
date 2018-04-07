@@ -1,15 +1,16 @@
 __author__ = 'ipman'
 
 from django.conf.urls import patterns, url
+from claim.views import *
 
 urlpatterns = patterns('',
-    url(r'^(?P<status>\w+)/page/(?P<page_id>\d+)/$', 'claim.views.get_requests_trouble_shooting'),
-    url(r'^item/(?P<request_id>\d+)/$', 'claim.views.get_new_save_request_item'),
-    url(r'^item/None/$', 'claim.views.get_new_save_request_item'),
-    url(r'^item/$', 'claim.views.get_new_save_request_item'),
-    url(r'^date/$', 'claim.views.get_requests_per_date'),
-
-    url(r'^(?P<status>\w+)/$', 'claim.views.get_requests_trouble_shooting'),
-
-    url(r'^', 'claim.views.get_requests_trouble_shooting'),
+    # Добавить, изменить заявку
+    url(r'^item/(?:id-(?P<request_id>\d+)/)?$', addget_request_trouble_shooting, name='add&get_request'),
+    # Список заявок с непредставленным актом
+    #url(r'^act_required/(?:page-(?P<page_id>\d+)/)?$', get_requests_actrequired, name='get_requests_actrequred'),
+    # Поиск и печать заявок c актами
+    url(r'^act_required/$', get_requests_actrequired, name='get_request_actrequired_fordate'),
+    # Вывести список заявок
+    url(r'^(?P<status>\w+)/(?:page-(?P<page_id>\d+)/)?$', get_requests_trouble_shooting, name='get_requests'),
+    url(r'^', get_requests_trouble_shooting),
 )

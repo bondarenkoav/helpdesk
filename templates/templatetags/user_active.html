@@ -1,0 +1,12 @@
+{% load short_fio %}
+
+<div class="card rounded border border-danger">
+    <div class="card-body">
+        <h4 class="card-title">Активные пользователи</h4>
+        <ul class="card-text">
+            {% for item in users %}
+                <li>{{ item.firstname }} {{ item.lastname }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>

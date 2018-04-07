@@ -1,30 +1,28 @@
 __author__ = 'ipman'
 
+from maintenance.views import *
 from django.conf.urls import patterns, url
 
 urlpatterns = patterns('',
-    url(r'^item/(?P<request_id>\d+)/object/(?P<object_id>\d+)/$', 'maintenance.views.get_new_save_request_item'),
-    url(r'^item/None/object/(?P<object_id>\d+)/$', 'maintenance.views.get_new_save_request_item'),
-    url(r'^item/$', 'maintenance.views.get_new_save_request_item'),
+    # Добавить заявку на ТО
+    url(r'^object/(?P<object_id>\d+)/item/(?:id-(?P<request_id>\d+)/)?$', addget_request_maintenance, name='add&get_request'),
+    # Добавить объект ТО
+    url(r'^objects/item/(?:id-(?P<object_id>\d+)/)?$', addget_object_maintenance, name='add&get_object'),
+    # Вывести объекты ТО на месяц
+    url(r'^objects_changemonth/$', get_requests_maintenance_change_month, name='get_requests_change_month'),
+    # Вывести объекты ТО
+    url(r'^objects/$', get_objects_maintenance, name='get_objects'),
+    # Добавить заявку на устранение неисправности во время ТО
+    url(r'^trouble/item/(?:id-(?P<request_id>\d+)/)?$', addget_trouble_shooting_item, name='add&get_trouble_request'),
+    # Вывести заявки по неисправностям
+    url(r'^trouble/(?:page-(?P<page_id>\d+)/)?$', get_trouble_shooting, name='get_troubles'),
+    # Вывести заявки ТО
+    #url(r'^(?P<status>\w+)/(?:page-(?P<page_id>\d+)/)?$', get_requests_maintenance, name='get_requests'),
+    url(r'^(?P<status>\w+)/$', get_requests_maintenance, name='get_requests'),
 
-    url(r'^objects/item/(?P<object_id>\d+)/$', 'maintenance.views.get_add_object_to_item'),
-    url(r'^objects/item/None/$', 'maintenance.views.get_add_object_to_item'),
-    url(r'^objects/item/$', 'maintenance.views.get_add_object_to_item'),
-
-    url(r'^objects_change_month/$', 'maintenance.views.get_requestTO_change_month'),
-
-    url(r'^objects/page/(?P<page_id>\d+)/$', 'maintenance.views.get_objects_to_status'),
-    url(r'^objects/$', 'maintenance.views.get_objects_to_status'),
-
-    url(r'^trouble_shooting/item/(?P<request_id>\d+)/$', 'maintenance.views.get_add_trouble_shooting_item'),
-    url(r'^trouble_shooting/item/None/$', 'maintenance.views.get_add_trouble_shooting_item'),
-    url(r'^trouble_shooting/page/(?P<page_id>\d+)/$', 'maintenance.views.get_trouble_shooting'),
-    url(r'^trouble_shooting/$', 'maintenance.views.get_trouble_shooting'),
-
-    url(r'^create_to_request/$', 'maintenance.cron.cron_create_maintenance_request'),
-    url(r'^close_request/$', 'maintenance.cron.cron_close_maintenance_object'),
-    url(r'^email_send/$', 'maintenance.cron.cron_sendmail_maintenance_request'),
-
-    url(r'^(?P<status>\w+)/page/(?P<page_id>\d+)/$', 'maintenance.views.get_requests_maintenance'),
-    url(r'^(?P<status>\w+)/$', 'maintenance.views.get_requests_maintenance'),
+    # url(r'^actrequired/(?:page-(?P<page_id>\d+)/)?$', get_requests_maintenance, name='get_requests_actrequired'),
+    # url(r'^create_to_request/$', 'maintenance.
+    # cron.cron_create_maintenance_request'),
+    # url(r'^close_request/$', 'maintenance.cron.cron_close_maintenance_object'),
+    # url(r'^email_send/$', 'maintenance.cron.cron_sendmail_maintenance_request'),
 )

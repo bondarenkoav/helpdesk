@@ -2,33 +2,46 @@
 {% load staticfiles %}
 {% load bootstrap3 %}
 
-{% block title %}Заявка №{{ object_id }}{% endblock %}
-
-{% block title_body %}
-
+{% block title %}Объект ТО{% endblock %}
+{% block title_body_h1 %}
+    {% if object_data %}
+        Объект №{{ object_data.id }}
+    {% else %}
+        Новый объект ТО
+    {% endif %}
+{% endblock %}
+{% block title_body_small %}
+    {% if object_data %}
+        <a href="{% url 'maintenance:add&get_request' object_data.id %}">Добавить заявку ТО</a>
+    {% endif %}
 {% endblock %}
 
-{% block title_body_h1 %}Объект №{{ object_id }}{% endblock %}
-{% block title_body_small %}<a href="/maintenance/item/None/object/{{ object_id }}/">Добавить заявку ТО</a>{% endblock %}
-
 {% block content %}
-
     <div class="container">
+        <small>
+            <ul class="list-inline" style="color: #808080;">
+                <li><strong>Создан:</strong> {{ object_data.DateTime_add }}</li>|
+                <li><strong>Обновлено:</strong> {{ object_data.DateTime_update }}</li>
+            </ul>
+        </small>
         <div class="panel panel-default">
             <div class="panel-body">
-
-                <form action="/maintenance/objects/item/{{ object_id }}/" method="post" class="form">
+                {% if object_data %}
+                    <form action="{% url 'maintenance:add&get_object' object_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'maintenance:add&get_object' %}" method="post" class="form">
+                {% endif %}
                     {% csrf_token %}
                     {% bootstrap_form form layout='horizontal' %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-primary btn-lg text-center" style="margin-top: 10px;">
-                            Сохранить ->
-                        </button>
-                    {% endbuttons %}
+                    <div class="text-right" style="margin-right: 10px;">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary btn-lg text-center" style="margin-top: 10px;">
+                                Сохранить ->
+                            </button>
+                        {% endbuttons %}
+                    </div>
                 </form>
-
             </div>
         </div>
     </div>
-
 {% endblock %}

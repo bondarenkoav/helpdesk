@@ -7,6 +7,7 @@ class CategoryMenu(MPTTModel):
     name    = models.CharField('Название', max_length=50) #, unique=True)
     slug    = models.SlugField('Ключ категории')
     parent  = TreeForeignKey('self', blank=True, null=True, verbose_name="Родитель", related_name='child', db_index=True)
+
     def __str__(self):
         return self.name
     class Meta:
@@ -14,15 +15,17 @@ class CategoryMenu(MPTTModel):
         verbose_name_plural = u'Дерево меню '
     class MPTTMeta:
         level_attr = 'mptt_level'
-        #order_insertion_by=['id']
+
 
 class TypeRequest(models.Model):
-    Name        = models.CharField(u'Наименование', max_length=100)
-    slug        = models.SlugField(u'Ключ статуса', unique=True)
+    Name = models.CharField(u'Наименование', max_length=100)
+    slug = models.SlugField(u'Ключ статуса', unique=True)
+
     def __str__(self):  return self.Name
     class Meta:
         verbose_name = u'Тип заявки '
         verbose_name_plural = u'Типы заявок '
+
 
 class support_request(models.Model):
     NumObject           = models.CharField(u'№ объекта',max_length=10)
@@ -43,6 +46,9 @@ class support_request(models.Model):
     DateTime_work       = models.DateField(u'Дата и время исполнения', null=True, blank=True)
     CoWorkers           = models.ManyToManyField(CoWorker, verbose_name='Исполнитель', blank=True)
     Status              = models.ForeignKey(Status, verbose_name='Статус заявки', default=2)
+    Required_act        = models.BooleanField(u'Требуется акт выполненных работ', default=False)
+    Date_act            = models.DateField(u'Дата предоставления акта', null=True, blank=True)
+
     def __str__(self):  return self.NumObject
     class Meta:
         verbose_name = u'Заявка '

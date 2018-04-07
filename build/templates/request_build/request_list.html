@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Заявки на монтаж{% endblock %}
+{% block title_body_h1 %}Монтаж оборудования{% endblock %}
+{% block title_body_small %}{{ status.Name }}{% endblock %}
+
+{% block content %}
+    <div class="table-responsive divsortTable">
+        <table class="table" id="sortTable">
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 5%;">№</td>
+                    <td style="width: 8%;">Добавлено</td>
+                    <td style="width: 20%;">Адрес объекта</td>
+                    <td style="width: 18%;">Контрагент</td>
+                    <td style="width: 15%;">Описание</td>
+                    <td style="width: 8%;">Запланировано</td>
+                    <td style="width: 8%;">Исполнено</td>
+                    <td style="width: 8%;">Исполнитель</td>
+                    <td style="width: 10%;">Автор</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in requests %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'build:add&get_request' item.id %}';">
+                        <td class="text-center">{{ item.id }}</td>
+                        <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m" }}</td>
+                        <td>{{ item.AddressObject }}</td>
+                        <td>{{ item.Client }}</td>
+                        <td>{{ item.DescriptionWorks|truncatechars:50 }}</td>
+                        <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                        <td class="text-center">{{ item.DateTime_work|date:"d.m.Y" }}</td>
+                        <td>
+                            {% for cowork in item.CoWorkers.all %}
+                                {{ cowork.Person_FIO|short_fio }},
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <small> {{ item.Create_user|get_user_publics }}</small>
+                            </p>
+                            <p>
+                                <span class="glyphicon glyphicon-edit"></span>
+                                <small> {{ item.Update_user|get_user_publics }}</small>
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

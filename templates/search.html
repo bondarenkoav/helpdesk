@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% load bootstrap3 short_fio get_user_publics %}
+
+{% block title %}Заявка на {{ filter }}{% endblock %}
+{% block title_body_h1 %}Поиск заявок{% endblock %}
+{% block title_body_small %}с параметризацией{% endblock %}
+
+{% block content %}
+    <div class="container panel panel-default noprint">
+        <div class="panel-body">
+            <form action="{% url 'dashboard:search' %}" method="post" class="form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-11">
+                        {% bootstrap_form form layout='horizontal' %}
+                    </div>
+                    <div class="col-xs-1 text-center" style="margin-left: -110px;">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary btn-lg">Вывести</button>
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div>
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr class="text-center">
+                        <td style="width: 5%;">№</td>
+                        <td style="width: 7%;">Добавлено</td>
+                        <td style="width: 5%;">Запланировано</td>
+                        <td style="width: 20%;">Объект</td>
+                        <td style="width: 15%;">Контрагент</td>
+                        <td style="width: 13%;">Вид неисправности</td>
+                        <td style="width: 15%;">Исполнитель</td>
+                        <td style="width: 5%;">Статус</td>
+                        <td style="width: 15%;">Описание устранения причины</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in requests %}
+                        {% if type == 'trouble' %}
+                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('{% url 'trouble:add&get_request' item.id %}')";>
+                        {% elif type == 'build' %}
+                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('{% url 'build:add&get_request' item.id %}')";>
+                        {% else %}
+                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('{% url 'maintenance:add&get_request' item.id %}')";>
+                        {% endif %}
+                            <td class="text-center">{{ item.id }}</td>
+                            <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m"  }}</td>
+                            <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                            <td class="text-right">
+                                {% if type == 'trouble' %}
+                                    {{ item.NumObject }} ({{ item.AddressObject }})
+                                {% elif type == 'build' %}
+                                    {{ item.AddressObject }}
+                                {% else %}
+                                    {{ item.Object.AddressObject }}
+                                {% endif %}
+                            </td>
+                            <td class="text-right">
+                                {% if type == 'trouble' %}
+                                    {{ item.Client }}
+                                {% elif type == 'build' %}
+                                    {{ item.Client }}
+                                {% else %}
+                                    {{ item.Object.Client }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">{{ item.FaultAppearance }}</td>
+                            <td class="text-center">
+                                {% if type == 'trouble' or type == 'maintenance' %}
+                                    {% for cowork in item.CoWorkers.all %}
+                                        {{ cowork.Person_FIO|short_fio }},
+                                    {% endfor %}
+                                {% else %}
+                                    {{ item.id|get_coworkers_build }}
+                                {% endif %}
+                            </td>
+                            <td class="text-center">{{ item.Status }}<br/>{{ item.DateTime_work|date:"d.m.Y" }}</td>
+                            <td>{{ item.DescriptionWorks }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+
+{% block title %}Заявка №{{ request_data.id }}{% endblock %}
+{% block title_body_h1 %}Заявка на устранение неисправностей во время ТО{% endblock %}
+{% block title_body_small %}№ {{ request_data.id }}{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                {% if request_data %}
+                    <form action="{% url 'maintenance:add&get_trouble_request' request_data.id %}" method="post" class="form">
+                {% else %}
+                    <form action="{% url 'maintenance:add&get_trouble_request' %}" method="post" class="form">
+                {% endif %}
+                    {% csrf_token %}
+                    {% bootstrap_form form layout='horizontal' %}
+                    {% buttons %}
+                        <button type="submit" class="btn btn-primary text-right">
+                            Сохранить
+                        </button>
+                    {% endbuttons %}
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load bootstrap3 %}
+{% load short_fio %}
+{% load get_user_publics %}
+
+{% block title %}Заявки с актами{% endblock %}
+{% block title_body_h1 %}Заявки требующие предоставления актов{% endblock %}
+{% block title_body_small %}{{ status.Name }}{% endblock %}
+
+{% block content %}
+    <div class="container panel panel-default noprint">
+        <div class="panel-body">
+            <form action="{% url 'trouble:get_request_actrequired_fordate' %}" method="post" class="form">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-xs-11">
+                        {% bootstrap_form form layout='horizontal' %}
+                    </div>
+                    <div class="col-xs-1 text-center" style="margin-left: -110px;">
+                        {% buttons %}
+                            <button type="submit" class="btn btn-primary btn-lg">Вывести</button>
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <caption>Список заявок с представленными актами {{ filter_date }}</caption>
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 5%;">№</td>
+                    <td style="width: 10%;">Добавлено</td>
+                    <td style="width: 8%;">№ объекта</td>
+                    <td style="width: 15%;">Адрес объекта</td>
+                    <td style="width: 15%;">Контрагент</td>
+                    <td style="width: 15%;">Вид неисправности</td>
+                    <td style="width: 10%;">Запланировано</td>
+                    <td style="width: 10%;">Исполнитель</td>
+                    <td style="width: 12%;">Автор</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% if requests_getact %}
+                    {% for item in requests_getact %}
+                        <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'trouble:add&get_request' item.id %}';">
+                            <td class="text-center">{{ item.id }}</td>
+                            <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m" }}</td>
+                            <td class="text-center">{{ item.NumObject }}</td>
+                            <td>{{ item.AddressObject }}</td>
+                            <td>{{ item.Client }}</td>
+                            <td>{{ item.FaultAppearance|truncatechars:50 }}</td>
+                            <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                            <td>
+                                {% for cowork in item.CoWorkers.all %}
+                                    {{ cowork.Person_FIO|short_fio }},
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <p>
+                                    <span class="glyphicon glyphicon-plus"></span>
+                                    <small> {{ item.Create_user|get_user_publics }}</small>
+                                </p>
+                                <p>
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                    <small> {{ item.Update_user|get_user_publics }}</small>
+                                </p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                {% else %}
+                    <tr><td colspan="9">Для отображения списка заявок с представленными актами - выполните поиск</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table class="table">
+            <caption>Список заявок с не представленными актами</caption>
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 5%;">№</td>
+                    <td style="width: 10%;">Добавлено</td>
+                    <td style="width: 8%;">№ объекта</td>
+                    <td style="width: 15%;">Адрес объекта</td>
+                    <td style="width: 15%;">Контрагент</td>
+                    <td style="width: 15%;">Вид неисправности</td>
+                    <td style="width: 10%;">Запланировано</td>
+                    <td style="width: 10%;">Исполнитель</td>
+                    <td style="width: 12%;">Автор</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in requests_notgetact %}
+                    <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'trouble:add&get_request' item.id %}';">
+                        <td class="text-center">{{ item.id }}</td>
+                        <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m" }}</td>
+                        <td class="text-center">{{ item.NumObject }}</td>
+                        <td>{{ item.AddressObject }}</td>
+                        <td>{{ item.Client }}</td>
+                        <td>{{ item.FaultAppearance|truncatechars:50 }}</td>
+                        <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                        <td>
+                            {% for cowork in item.CoWorkers.all %}
+                                {{ cowork.Person_FIO|short_fio }},
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <small> {{ item.Create_user|get_user_publics }}</small>
+                            </p>
+                            <p>
+                                <span class="glyphicon glyphicon-edit"></span>
+                                <small> {{ item.Update_user|get_user_publics }}</small>
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% comment %}{% block pagination %}
+    <ul class="pagination">
+        {% if requests.has_previous == True %}
+            <li><a href="{% url 'trouble:get_requests_actrequired' requests.previous_page_number %}">&laquo;</a></li>
+            <li><a href="{% url 'trouble:get_requests_actrequired' 1 %}">1</a></li>
+            <li class="disabled"><a href="#">...</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        {% endif %}
+        {% for page in requests.paginator.page_range %}
+            {% if page == requests.number %}
+                <li class="active">
+                    <a>{{ requests.number }}<span class="sr-only">(текущая)</span></a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if requests.has_next == True %}
+            <li class="disabled"><a href="#">...</a></li>
+            <li><a href="{% url 'trouble:get_requests_actrequired' requests.paginator.num_pages %}">{{ requests.paginator.num_pages }}</a></li>
+            <li><a href="{% url 'trouble:get_requests_actrequired' requests.next_page_number %}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}{% endcomment %}

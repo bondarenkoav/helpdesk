@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load bootstrap3 short_fio get_user_publics %}
+
+{% block title %}Список заявок{% endblock %}
+{% block title_body_h1 %}Техническое обслуживание{% endblock %}
+{% block title_body_small %}{{ status.Name }}{% endblock %}
+
+{% block content %}
+    <div class="container text-center">
+        <div class="panel panel-default noprint">
+            <div class="panel-body">
+                <form action="{% url 'maintenance:get_requests' status.slug %}" method="post" class="form">
+                    <div class="row">
+                        <div class="col-xs-8 text-right">
+                            {% csrf_token %}
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-2 text-left">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary text-center">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table" id="sortTable">
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 5%;">№ п/п</td>
+                    <td style="width: 7%;">№ заявки</td>
+                    <td style="width: 7%;">Добавлено</td>
+                    <td style="width: 7%;">№ объекта</td>
+                    <td style="width: 20%;">Адрес объекта</td>
+                    <td style="width: 20%;">Контрагент</td>
+                    <td style="width: 8%;">Объём работ</td>
+                    <td style="width: 8%;">Запланировано</td>
+                    <td style="width: 8%;">Исполнитель</td>
+                    <td style="width: 10%;">Автор</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in requests %}
+                    <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'maintenance:add&get_request' item.Object.id item.id %}')";>
+                        <td class="text-center">{{ forloop.counter }}</td>
+                        <td class="text-center">{{ item.id }}</td>
+                        <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m" }}</td>
+                        <td class="text-center">{{ item.Object.NumObject }}</td>
+                        <td>{{ item.Object.AddressObject }}</td>
+                        <td class="text-center">{{ item.Object.Client }}</td>
+                        <td class="text-center">
+                            {% for type_secur in item.Object.TypeSecurity.all %}
+                                {{ type_secur.Name }},
+                            {% endfor %}
+                        </td>
+                        <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                        <td>
+                            {% for type_secur in item.CoWorkers.all %}
+                                {{ type_secur.Person_FIO|short_fio }},
+                            {% endfor %}
+                        </td>
+                        <td>
+                            <p>
+                                <span class="glyphicon glyphicon-plus"></span>
+                                <small> {{ item.Create_user|get_user_publics }}</small>
+                            </p>
+                            <p>
+                                <span class="glyphicon glyphicon-edit"></span>
+                                <small> {{ item.Update_user|get_user_publics }}</small>
+                            </p>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% comment %}
+{% block pagination %}
+    <ul class="pagination">
+        {% if requests.has_previous == True %}
+            <li><a href="{% url 'maintenance:get_requests' requests.previous_page_number %}">&laquo;</a></li>
+            <li><a href="{% url 'maintenance:get_requests' '1' %}">1</a></li>
+            <li class="disabled"><a href="#">...</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&laquo;</a></li>
+        {% endif %}
+        {% for page in requests.paginator.page_range %}
+            {% if page == requests.number %}
+                <li class="active">
+                    <a>{{ requests.number }}<span class="sr-only">(текущая)</span></a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% if requests.has_next == True %}
+            <li class="disabled"><a href="#">...</a></li>
+            <li><a href="{% url 'maintenance:get_requests' requests.paginator.num_pages %}">{{ requests.paginator.num_pages }}</a></li>
+            <li><a href="{% url 'maintenance:get_requests' requests.next_page_number %}">&raquo;</a></li>
+        {% else %}
+            <li class="disabled"><a href="#">&raquo;</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}{% endcomment %}

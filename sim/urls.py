@@ -1,17 +1,14 @@
 __author__ = 'ipman'
 
 from django.conf.urls import patterns, url
-from sim import views as sim_views
+from sim.views import *
 from report import views as report_views
 
 urlpatterns = patterns('',
-    url(r'^page/(?P<page_id>\d+)/$', sim_views.get_simcard_list),
-    url(r'^jornal_change/$', report_views.get_jornal_changes),
-
-    url(r'^(?P<status>\w+)/page/(?P<page_id>\d+)/$', sim_views.get_simcard_list),
-    url(r'^item/(?P<simcard_id>\d+)/$', sim_views.get_new_simcard_item),
-    url(r'^item/None/$', sim_views.get_new_simcard_item),
-
-    url(r'^(?P<status>\w+)/$', sim_views.get_simcard_list),
-
+    # Карточка симкарты
+    url(r'^item/(?:id-(?P<simcard_id>\d+)/)?$', get_new_simcard_item, name='add&get_simcard'),
+    # Список симкарт
+    url(r'^(?P<status>\w+)/$', get_simcard_list, name='getlist_simcard'),
+    # Журнал изменений
+    url(r'^jornal_change/$', report_views.get_jornal_changes, name='journal_changes'),
 )

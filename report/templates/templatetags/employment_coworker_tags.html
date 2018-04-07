@@ -1,0 +1,74 @@
+{% load short_fio %}
+
+{% if list_build or list_trouble or list_maintenance %}
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">{{ coworker.Person_FIO }}</div>
+
+        <!-- Table -->
+        <table class="table">
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 20%;">Дата</td>
+                    <td style="width: 40%;">Объект</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Монтаж -->
+                {% if list_build %}
+                    <tr>
+                        <td colspan="2">
+                            <strong>Монтаж</strong>
+                        </td>
+                    </tr>
+                    {% for item_build in list_build %}
+                        <tr>
+                            <td class="text-center">{{ item_build.Day_reporting }}</td>
+                            <td class="text-center">{{ item_build.build_request.Client.Name }} ({{ item_build.build_request.AddressObject }})</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_build|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+                {% if list_maintenance %}
+                    <tr>
+                        <td colspan="2"><strong>Техническое обслуживание</strong></td>
+                    </tr>
+                    {% for item_maintenance in list_maintenance %}
+                        <tr>
+                            <td class="text-center">{{ item_maintenance.DateTime_work }}</td>
+                            <td class="text-center">{{ item_maintenance.Object.Client }} ({{ item_maintenance.Object.AddressObject }})</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_maintenance|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+                {% if list_trouble %}
+                    <tr>
+                        <td colspan="2">
+                            <strong>Устранение неисправностей</strong>
+                        </td>
+                    </tr>
+                    {% for item_trouble in list_trouble %}
+                        <tr>
+                            <td class="text-center">{{ item_trouble.DateTime_work}}</td>
+                            <td class="text-center">
+                                {% if item_trouble.Client_bd != None %}
+                                    {{ item_trouble.Client_bd }}
+                                {% else %}
+                                    {{ item_trouble.Client }}
+                                {% endif %}
+                                ({{ item_trouble.NumObject }} - {{ item_trouble.AddressObject }})
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_trouble|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

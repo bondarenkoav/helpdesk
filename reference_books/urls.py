@@ -1,27 +1,18 @@
 __author__ = 'ipman'
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
+from reference_books.views import *
 
-urlpatterns = patterns('',
-    url(r'^transmitters/item/(?P<transmitter_id>\d+)/$', 'reference_books.views.get_new_save_transmitters_item'),
-    url(r'^transmitters/item/None/$', 'reference_books.views.get_new_save_transmitters_item'),
-    url(r'^transmitters/item/$', 'reference_books.views.get_new_save_transmitters_item'),
-    url(r'^transmitters/$', 'reference_books.views.get_model_transmitters'),
+urlpatterns = [
+    url(r'^transmitters/item/(?P<transmitter_id>\d+)/$', get_add_transmitter, name='add&get_transmitter'),
+    url(r'^transmitters/$', get_transmitters, name='get_transmitters'),
 
-    url(r'^routs/item/(?P<routes_id>\d+)/$', 'reference_books.views.get_add_routs_item'),
-    url(r'^routs/item/None/$', 'reference_books.views.get_add_routs_item'),
-    url(r'^routs/item/$', 'reference_books.views.get_add_routs_item'),
-    url(r'^routs/$', 'reference_books.views.get_routs'),
+    url(r'^routs/item/(?P<routes_id>\d+)/$', get_add_rout, name='add&get_rout'),
+    url(r'^routs/$', get_routs, name='get_transmitters'),
 
-    url(r'^clients/item/(?P<client_id>\d+)/$', 'reference_books.views.get_new_save_clients_item'),
-    url(r'^clients/item/None/$', 'reference_books.views.get_new_save_clients_item'),
-    url(r'^clients/item/$', 'reference_books.views.get_new_save_clients_item'),
-    url(r'^clients/page/(?P<page_id>\d+)/$', 'reference_books.views.get_clients'),
-    url(r'^clients/$', 'reference_books.views.get_clients'),
+    url(r'^clients/item/(?P<client_id>\d+)/$', get_add_client, name='add&get_client'),
+    url(r'^clients/(?:page-(?P<page_id>\d+)/)?$', get_clients, name='get_clients'),
 
-    url(r'^coworker/item/(?P<coworker_id>\d+)/$', 'reference_books.views.get_new_save_coworker_item'),
-    url(r'^coworker/item/None/$', 'reference_books.views.get_new_save_coworker_item'),
-    url(r'^coworker/item/$', 'reference_books.views.get_new_save_coworker_item'),
-    url(r'^coworker/page/(?P<page_id>\d+)/$', 'reference_books.views.get_coworker'),
-    url(r'^coworker/$', 'reference_books.views.get_coworker'),
-)
+    url(r'^coworker/item/(?P<coworker_id>\d+)/$', get_add_coworker, name='add&get_coworker'),
+    url(r'^coworker/(?:page-(?P<page_id>\d+)/)?$', get_coworkers, name='get_coworkers'),
+]
