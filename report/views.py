@@ -1,13 +1,8 @@
 import datetime
 from django.core.paginator import Paginator
-from django.shortcuts import render, render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.template.context_processors import csrf
-from build.models import build_request
-from claim.models import support_request
-from claim.views import custom_proc
-from maintenance.models import maintenance_request, objects_to
-from reference_books.models import ExpandedUserProfile, CoWorker, Status
+from reference_books.models import ExpandedUserProfile, CoWorker
 from report.forms import coworkers_range_date
 from report.models import logging
 from django.contrib.auth.decorators import login_required

@@ -1,0 +1,19 @@
+{% load dashboard_tags %}
+
+<nav class="navbar navbar-default navbar-fixed-bottom" role="navigation">
+    <div class="row">
+        {% if user.is_authenticated %}
+            <div class="col-xs-4 text" style="margin-top: 10px; padding-left: 30px;">
+                 <abbr title="Разработчик">{{ 'dev_name'|get_constans }}</abbr> для <strong>{{ 'owner'|get_constans }}</strong>
+            </div>
+            <div class="col-xs-6 text-center" style="padding-top: 5px;">
+                <div class="text-center">
+                    {% block pagination %}{% endblock %}
+                </div>
+            </div>
+            <div class="col-xs-2 text-center" style="margin-top: 10px;">
+                <a href="#">Вернутся наверх ^</a>
+            </div>
+        {% endif %}
+    </div>
+</nav>

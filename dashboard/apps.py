@@ -1,5 +1,6 @@
-from django.apps import AppConfig
+__author__ = 'ipman'
 
+from django.apps import AppConfig
 
 class DashboardConfig(AppConfig):
     name = 'dashboard'

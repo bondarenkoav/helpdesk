@@ -1,6 +1,6 @@
 __author__ = 'ipman'
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from dashboard.views import *
 
 urlpatterns = [

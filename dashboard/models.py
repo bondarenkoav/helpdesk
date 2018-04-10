@@ -7,7 +7,7 @@ class Menu(MPTTModel):
     name    = models.CharField('Название', max_length=50) #, unique=True)
     slug    = models.SlugField('Ключ категории')
     parent  = TreeForeignKey('self', blank=True, null=True, verbose_name="Родитель", related_name='child', db_index=True)
-    icon    = models.CharField('Класс иконки bootstrap', max_length=10, help_text="Допустим: search")
+    icon    = models.CharField('Класс иконки bootstrap', max_length=10, help_text="Допустим: search", blank=True)
 
     def __str__(self):
         return self.name

@@ -5,29 +5,28 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from django.template.context_processors import csrf
 from build.models import build_request
-from claim.models import CategoryMenu, support_request
+from claim.models import support_request
 from dashboard.forms import LoginForm, search_form
 from maintenance.models import maintenance_request
 from reference_books.models import ExpandedUserProfile
 
 
-def log_in(request):
-    args = {}
-    args.update(csrf(request))
-
-    if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            if form.get_user():
-                login(request, form.get_user())
-                return HttpResponseRedirect(reverse(':get_requests'))
-    else:
-        args['form'] = LoginForm()
-    return render(request, 'login.html', args)
+# def log_in(request):
+#     args = {}
+#     args.update(csrf(request))
+#
+#     if request.method == 'POST':
+#         form = LoginForm(request.POST)
+#         if form.is_valid():
+#             if form.get_user():
+#                 login(request, form.get_user())
+#                 return HttpResponseRedirect(reverse(':get_requests'))
+#     else:
+#         args['form'] = LoginForm()
+#     return render(request, 'login.html', args)
 
 
 def logout(request):
@@ -137,7 +136,7 @@ def search_requests(request):
                                              'coworkers':coworker,
                                              'status':status,
                                              'numobject':numobject})
-            return render_to_response('search.html', args, context_instance=RequestContext(request, processors=[custom_proc]))
+            return render(request, 'search.html', args)
         else:
             return render(request, 'search.html', {'form': form})
     else:

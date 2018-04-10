@@ -9,12 +9,6 @@ class support_requestAdmin(admin.ModelAdmin):
 class StatusAdmin(admin.ModelAdmin):
     list_display = ['Name','slug','tr_color']
 
-class CustomMPTTModelAdmin(MPTTModelAdmin):
-    mptt_level_indent = 20
-
-#admin.site.register(CategoryMenu, MPTTModelAdmin)
-admin.site.register(CategoryMenu, DraggableMPTTAdmin)
-
 admin.site.register(TypeRequest)
 admin.site.register(Status, StatusAdmin)
 admin.site.register(support_request, support_requestAdmin)

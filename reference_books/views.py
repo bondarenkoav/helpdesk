@@ -27,11 +27,11 @@ def client_names(name):
     return name
 
 @login_required
-def get_model_transmitters(request):
+def get_transmitters(request):
     return render(request, 'transmitters/transmitters_list.html', {'list_transmitters' : ModelTransmitter.objects.all()})
 
 
-def get_new_save_transmitters_item(request, transmitter_id=None):
+def get_add_transmitter(request, transmitter_id=None):
     args = {}
     args.update(csrf(request))
     form = get_new_save_transmitter(request.POST or None, instance=transmitter_id and ModelTransmitter.objects.get(id=transmitter_id))
@@ -52,7 +52,7 @@ def get_clients(request, page_id=1):
     return render(request, 'client/clients_list.html', {'list_clients': current_page.page(page_id)})
 
 
-def get_new_save_clients_item(request, client_id=None):
+def get_add_client(request, client_id=None):
     args = {}
     args.update(csrf(request))
     form = get_new_save_client(request.POST or None, instance=client_id and Client.objects.get(id=client_id))
@@ -71,7 +71,7 @@ def get_new_save_clients_item(request, client_id=None):
         return render(request, 'client/clients_item.html', args)
 
 
-def get_coworker(request, page_id=1):
+def get_coworkers(request, page_id=1):
     args = {}
     user_company = ExpandedUserProfile.objects.get(UserName=request.user.id).ServingCompany
     current_page = Paginator(CoWorker.objects.filter(ServingCompany=user_company).order_by('Person_FIO'),20)
@@ -79,7 +79,7 @@ def get_coworker(request, page_id=1):
     return render(request, 'coworker/coworker_list.html', args)
 
 
-def get_new_save_coworker_item(request, coworker_id=None):
+def get_add_coworker(request, coworker_id=None):
     args = {}
     args.update(csrf(request))
     form = co_worker_form(request.POST or None, instance=coworker_id and CoWorker.objects.get(id=coworker_id))
@@ -110,7 +110,7 @@ def get_routs(request):
     return render(request, 'routes/routs_list.html', args)
 
 
-def get_add_routs_item(request, routes_id=None):
+def get_add_rout(request, routes_id=None):
     args = {}
     args.update(csrf(request))
     form = get_add_routes(request.POST or None, instance=routes_id and RoutesMaintenance.objects.get(id=routes_id))

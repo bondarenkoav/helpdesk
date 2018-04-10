@@ -3,12 +3,10 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.template.context_processors import csrf
 from build.forms import get_new_save_acts_build, coworkers_range_date, coworkers_object, coworker_range_date, get_new_save_request
 from build.models import acts_build, build_request
-from dashboard.views import custom_proc
 from reference_books.models import ExpandedUserProfile, CoWorker, Status
 
 

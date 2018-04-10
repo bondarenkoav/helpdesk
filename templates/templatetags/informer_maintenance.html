@@ -1,11 +1,17 @@
 <div class="panel panel-primary">
     <div class="panel-heading">
-        <h2 class="h1" style="color: white">ТО</h2>
-        <dl class="dl-horizontal">
-            <dt>В ожидании</dt><dd>request_open </dd>
-            <dt>Назначено</dt><dd>request_work </dd>
-            <dt>Под контролем</dt><dd>request_control </dd>
-        </dl>
+        <div class="row">
+            <div class="col-lg-6 col-md-6">
+                <h2 class="h1" style="color: white;">ТО</h2>
+            </div>
+            <div class="col-lg-6 col-md-6">
+                <dl class="dl-horizontal">
+                    <dt>В ожидании</dt><dd>{{ requests_open }}</dd>
+                    <dt>Назначено</dt><dd>{{ requests_work }}</dd>
+                    <dt>Под контролем</dt><dd>{{ requests_control }}</dd>
+                </dl>
+            </div>
+        </div>
     </div>
     <a href="#">
         <div class="panel-footer">

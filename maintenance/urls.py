@@ -1,9 +1,9 @@
 __author__ = 'ipman'
 
 from maintenance.views import *
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 
-urlpatterns = patterns('',
+urlpatterns = [
     # Добавить заявку на ТО
     url(r'^object/(?P<object_id>\d+)/item/(?:id-(?P<request_id>\d+)/)?$', addget_request_maintenance, name='add&get_request'),
     # Добавить объект ТО
@@ -25,4 +25,4 @@ urlpatterns = patterns('',
     # cron.cron_create_maintenance_request'),
     # url(r'^close_request/$', 'maintenance.cron.cron_close_maintenance_object'),
     # url(r'^email_send/$', 'maintenance.cron.cron_sendmail_maintenance_request'),
-)
+]

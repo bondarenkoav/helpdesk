@@ -1,9 +1,9 @@
 __author__ = 'ipman'
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from build.views import *
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^item/(?:id-(?P<request_id>\d+)/)?$', addget_request_build, name='add&get_request'),
     url(r'^(?P<status>\w+)/$', get_requests_build, name='get_requests'),
 
@@ -24,4 +24,4 @@ urlpatterns = patterns('',
     # url(r'^coworker_range_date/$', 'build.views.get_coworker_range_date'),
     #
     # #url(r'^acts/$', 'build.views.get_acts_build'),
-)
+]

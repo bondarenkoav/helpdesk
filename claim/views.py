@@ -1,17 +1,12 @@
 import datetime
-from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
-from django.contrib import auth
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, render
-from django.template import RequestContext
+from django.shortcuts import render
 from django.template.context_processors import csrf
-from claim.models import support_request, CategoryMenu
+from claim.models import support_request
 from claim.forms import get_new_save_request, request_actrequired_fordate
-from dashboard.views import custom_proc
 from reference_books.models import ExpandedUserProfile, Status
 
 @login_required
