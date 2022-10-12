@@ -1,0 +1,34 @@
+{% extends 'container.html' %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}Справочники{% endblock %}
+{% block add_object_url %}{% url url_addget %}{% endblock %}
+{% block add_object_name %}исполнителя{% endblock %}
+
+{% block table_head %}
+    <td style="width: 5%;">#</td>
+    <td style="width: 40%;">ФИО сотрудника</td>
+    <td style="width: 20%;">Должность</td>
+    <td style="width: 10%;">Занятость</td>
+    <td style="width: 25%;">Компания</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in list %}
+        <tr id="obj_{{ item.id }}" onclick="location.href = '{% url url_addget item.id %}';">
+            <td class="text-center">{{ item.id }}</td>
+            <td>{{ item.Person_FIO }}</td>
+            <td>{{ item.Posts }}</td>
+            <td class="text-center">{% if item.StatusWorking %}Работает{% else %}Уволен{% endif %}</td>
+            <td class="text-right">
+                {% for company in item.ServiceCompany.all %}
+                    {% if forloop.last %}{{ company.Name }}{% else %}{{ company.Name }}, {% endif %}
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

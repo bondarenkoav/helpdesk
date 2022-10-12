@@ -1,0 +1,258 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags tasks_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block include_header %}
+    <style>
+        .tab-pane {
+            padding: 15px;
+        }
+    </style>
+    <link rel="stylesheet" href="{% static "css/suggestions-15.12.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="margin-bottom: 30px;">
+        <form action="{% url 'tasks:calc_executor' calc_data.id %}" method="post" enctype="multipart/form-data">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link active" id="nav-base-tab" data-toggle="tab" href="#nav-base"
+                       role="tab" aria-controls="nav-base" aria-selected="true">Исходная информация</a>
+                    <a class="nav-item nav-link" id="nav-executor-tab" data-toggle="tab" href="#nav-executor"
+                       role="tab" aria-controls="nav-executor" aria-selected="false">Исполнитель</a>
+                    <a class="nav-item nav-link" id="nav-rest-tab" data-toggle="tab" href="#nav-rest"
+                       role="tab" aria-controls="nav-rest" aria-selected="false">Остальные</a>
+                    <a class="nav-item nav-link" id="nav-files-tab" data-toggle="tab" href="#nav-files"
+                       role="tab" aria-controls="nav-files" aria-selected="false">Файлы</a>
+                    <a class="nav-item nav-link" id="nav-estimate-tab" data-toggle="tab" href="#nav-estimate"
+                       role="tab" aria-controls="nav-estimate" aria-selected="false">Калькуляция</a>
+                    <a class="nav-item nav-link" id="nav-history-tab" data-toggle="tab" href="#nav-history"
+                       role="tab" aria-controls="nav-history" aria-selected="false">История</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Создать</a>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="{% url 'tasks:addget_materials' calc_data.id %}" about="_blank">Ввод материалов и работ</a>
+                            <a class="dropdown-item" href="{% url 'tasks:print_workorder' calc_data.id %}">Заказ-наряд</a>
+                            <a class="dropdown-item" href="{% url 'tasks:print_actdelivery' calc_data.id %}">Акт приёмо-сдачи</a>
+                        </div>
+                    </li>
+                </div>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-base" role="tabpanel" aria-labelledby="nav-base-tab">
+                    <div>
+                        {% bootstrap_field form.ContactPerson layout='horizontal' %}
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            {% bootstrap_label "Тип сигнализации" label_for="TypeTask" %}
+                        </div>
+                        <div class="col-9">
+                            {% for choice in form.TypeTask %}
+                                <div class="form-check-inline" {% if forloop.counter0 == 0 %}style="margin-left: -.75rem;"{% endif %}>
+                                    {% bootstrap_label choice %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            {% bootstrap_label "Объект" label_for="NameObject" %}
+                        </div>
+                        <div class="col-3">
+                            {% bootstrap_field form.NameObject layout='inline' %}
+                        </div>
+                        <div class="col-6">
+                            {% bootstrap_field form.AddressObject layout='inline' %}
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="col-3">
+                            {% bootstrap_label "Номер телефона/Email" label_for="Phone" %}
+                        </div>
+                        <div class="col-3">
+                            {% bootstrap_field form.Phone layout='inline' %}
+                        </div>
+                        <div class="col-6">
+                            {% bootstrap_field form.Address_email layout='inline' %}
+                        </div>
+                    </div>
+                    <div>
+                        {% bootstrap_field form.Description layout='horizontal' %}
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-executor" role="tabpanel" aria-labelledby="nav-executor-tab">
+                    <div class="row">
+                        <div class="col-3"><label>Исполнитель</label></div>
+                        <div class="col-5">{{ calc_data.executor }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                        {% bootstrap_label "Дата/время осмотра" label_for="Date_inspection" %}
+                        </div>
+                        <div class="col-3">
+                            {% bootstrap_field form.Date_inspection layout='inline' %}
+                        </div>
+                        <div class="col-2">
+                            {% bootstrap_field form.Time_inspection layout='inline' %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                        {% bootstrap_label "Каналы связи" label_for="Channels_connection" %}
+                        </div>
+                        <div class="col-4">
+                            {% bootstrap_field form.Channels_connection layout='inline' %}
+                        </div>
+                        <div class="col-5">
+                            {% bootstrap_field form.Frequency_tests layout='inline' %}
+                        </div>
+                    </div>
+                    {% if calc_data.total_summ %}
+                        <hr/>
+                        <div class="row">
+                            <div class="col-3">
+                                Общая сумма калькуляции:
+                            </div>
+                            <div class="col-2">
+                                {{ calc_data.total_summ }} Руб.
+                            </div>
+                            <div class="col-7">
+                                {% if calc_data.Estimate %}
+                                    <i class="fa fa-check" style="color: green;" aria-hidden="true"></i> Калькуляция подписана
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    {% bootstrap_field form.Status layout='horizontal' %}
+                </div>
+                <div class="tab-pane fade" id="nav-rest" role="tabpanel" aria-labelledby="nav-rest-tab">
+                    <div class="row">
+                        <div class="col-3"><label>Бухгалтер</label></div>
+                        <div class="col-5">{{ calc_data.accountant }}</div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3"><label>Бухгалтер-материалист</label></div>
+                        <div class="col-5">{{ calc_data.storekeeper }}</div>
+                    </div>
+                    <div>{% bootstrap_field form.Date_waiting layout='horizontal' %}</div>
+                    <div>{% bootstrap_field form.Date_actual layout='horizontal' %}</div>
+                </div>
+                <div class="tab-pane fade" id="nav-files" role="tabpanel" aria-labelledby="nav-files-tab">
+                    <div class="row">
+                        <div class="col-3">
+                            {% bootstrap_label "Скан калькуляции" label_for="Estimate" %}
+                        </div>
+                        <div class="col-6">
+                            {% if calc_data.Estimate %}
+                                <a href="{% url 'tasks:get_estimate' calc_data.id %}" target="_blank">
+                                    <i class="fa fa-paperclip fa-lg" aria-hidden="true"></i> Открыть вложение
+                                </a>
+                            {% else %}
+                                {% bootstrap_field form.Estimate layout='inline' error_css_class='invalid-feedback' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-3">
+                            {% bootstrap_label "Скан акта приёмо-сдачи" label_for="Act_Delivery" %}
+                        </div>
+                        <div class="col-6">
+                            {% if calc_data.Act_Delivery %}
+                                <a href="{% url 'tasks:get_estimate' calc_data.id %}" target="_blank">
+                                    <i class="fa fa-paperclip fa-lg" aria-hidden="true"></i> Открыть вложение
+                                </a>
+                            {% else %}
+                                {% bootstrap_field form.Act_Delivery layout='inline' error_css_class='invalid-feedback' %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-estimate" role="tabpanel" aria-labelledby="nav-estimate-tab">
+                    {% bootstrap_field form.client_consent layout='inline' error_css_class='invalid-feedback' %}
+                    <table class="table table-sm">
+                        <thead>
+                            <tr class="text-center">
+                                <th scope="col">#</th>
+                                <th scope="col">Материалы</th>
+                                <th scope="col">Количество</th>
+                                <th scope="col">Стоимость материалов</th>
+                                <th scope="col">Стоимость работ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in materials %}
+                            <tr>
+                                <th class="text-center pt-3">{{ forloop.counter }}</th>
+                                <td>{{ item.material.name }}</td>
+                                <td class="text-center">{{ item.quantity }}</td>
+                                <td class="text-center">{{ item.material_total }}</td>
+                                <td class="text-center">{{ item.work_total }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            {% if calc_data.commissioning %}
+                            <tr>
+                                <th colspan="4" class="float-right pt-3">Пусконаладочные работы:</th>
+                                <td>{{ calc_data.commissioning }} Руб.</td>
+                            </tr>{% endif %}
+                            {% if calc_data.Sale %}
+                            <tr>
+                                <th colspan="4" class="float-right pt-3">Снижение стоимости работ:</th>
+                                <td>{{ calc_data.Sale }}%.</td>
+                            </tr>{% endif %}
+                            {% if calc_data.projects %}
+                            <tr>
+                                <th colspan="4" class="float-right pt-3">Проектные работы:</th>
+                                <td>{{ calc_data.projects.price }} Руб.</td>
+                            </tr>{% endif %}
+                            {% if calc_data.total_summ %}
+                            <tr>
+                                <th colspan="4" class="float-right pt-3">Итоговая сумма:</th>
+                                <td>{{ calc_data.total_summ }} Руб.</td>
+                            </tr>{% endif %}
+                        </tfoot>
+                    </table>
+                </div>
+                <div class="tab-pane fade" id="nav-history" role="tabpanel" aria-labelledby="nav-history-tab">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Дата и время</th>
+                                <th scope="col">Событие</th>
+                                <th scope="col">Значение</th>
+                                <th scope="col">Добавил</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for item in history %}
+                            <tr>
+                                <th scope="row">{{ forloop.counter }}</th>
+                                <td>{{ item.DateTime_add }}</td>
+                                <td>{{ item.event }}</td>
+                                <td>{{ item.value }}</td>
+                                <td>{{ item.user.get_full_name }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="margin-top: 15px;" class="float-right">
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block include_footer %}
+    <!-- DaData -->
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+    <script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 %}
+
+{% block include_header %}
+    <!-- DaData -->
+    <link rel="stylesheet" href="{% static "css/suggestions-15.12.css" %}">
+
+    <!-- Choosen select -->
+    <link rel="stylesheet" href="{% static "css/prism.css" %}">
+    <link rel="stylesheet" href="{% static "css/chosen.min.css" %}">
+{% endblock %}
+
+{% block page_title %}Заявка{% endblock %}
+{% block section_active %}
+    {% if trouble_data %}
+        №{{ trouble_data.id }}
+    {% else %}
+        новая
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form action="{% if trouble_data %}{% url 'maintenance:addget_mtroubles' trouble_data.id %}{% else %}{% url 'maintenance:addget_mtroubles' %}{% endif %}" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form_errors form %}
+            <div>
+                {% bootstrap_field form.ServiceCompany layout='horizontal' %}
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-3" style="padding-top: 5px;">
+                        {% bootstrap_label "Адрес/Маршрут" label_for="Client_choices" %}
+                    </div>
+                    <div class="col-5">
+                        {% bootstrap_field form.AddressObject layout='inline' %}
+                    </div>
+                    <div class="col-4">
+                        {% bootstrap_field form.Routes layout='inline' %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-3" style="padding-top: 5px;">
+                        {% bootstrap_label "Контрагент" label_for="Client_choices" %}
+                    </div>
+                    <div class="col-9" style="padding-top: 5px;">
+                        <div class="row">
+                            <div class="col-12">
+                                {% bootstrap_field form.Client_choices layout='inline' %}
+                            </div>
+                            <div class="col-1">или</div>
+                            <div class="col-11">{% bootstrap_field form.Client_words layout='inline' %}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% bootstrap_field form.FaultAppearance layout='horizontal' %}
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-3" style="padding-top: 5px;">
+                        {% bootstrap_label "Выполнено" label_for="DescriptionWorks" %}
+                    </div>
+                    <div class="col-2">
+                        {% bootstrap_field form.DateTime_work layout='inline' %}
+                    </div>
+                    <div class="col-7">
+                        {% bootstrap_field form.DescriptionWorks layout='inline' %}
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% bootstrap_field form.CoWorkers layout='horizontal' %}
+            </div>
+            <div>
+                {% bootstrap_field form.Status layout='horizontal' %}
+            </div>
+            <div>
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block include_footer %}
+    <!-- DaData -->
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+    <script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+
+    <!-- Choosen select -->
+    <script src="{% static "js/chosen.jquery.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/prism.js" %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        var config = {
+            '.chosen-select'           : {},
+            '.chosen-select-deselect'  : {allow_single_deselect:true},
+            '.chosen-select-no-single' : {disable_search_threshold:10},
+            '.chosen-select-no-results': {no_results_text:'Упс, не найдено!'},
+            '.chosen-select-width'     : {width:"95%"}
+        }
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+    </script>
+{% endblock %}

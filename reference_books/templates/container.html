@@ -1,0 +1,30 @@
+{% extends 'page.html' %}
+
+{% block page_title %}{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block content %}
+    <div class="add-object float-right" style="position: relative; z-index: 2; top: -45px; margin-right: 30px;" >
+        <a href="{% block add_object_url %}{% endblock %}">
+            <i class="fa fa-plus-circle fa-5x" aria-hidden="true" style="text-shadow: 1px 1px 2px black, 0 0 1em white;"
+               data-toggle="tooltip" data-placement="left" title="Добавить {% block add_object_name %}{% endblock %}">
+            </i>
+        </a>
+    </div>
+    <div class="container" style="position: relative; z-index: 1; margin-top: -17px; margin-bottom: 20px;">
+        <table class="table table-sm">
+            <thead>
+                <tr class="text-center">
+                    {% block table_head %}
+                    {% endblock %}
+                </tr>
+            </thead>
+            <tbody>
+                {% block table_body %}
+                {% endblock %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block pagination %}{% endblock %}

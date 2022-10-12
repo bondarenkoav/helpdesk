@@ -1,0 +1,58 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags build_request_tags paginator_tags %}
+
+{% block page_title %}Монтаж{% endblock %}
+{% block section_active %}{{ status|get_status_name }}{% endblock %}
+
+{% block filters_form %}
+    {% bootstrap_form proposals_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False  %}
+{% endblock %}
+
+{% block add_object_url %}{% url 'build:addget_bproposals' %}{% endblock %}
+{% block add_object_name %}заявку{% endblock %}
+
+{% block title_print %}Монтаж {{ status|get_status_name }}{% endblock %}
+{% block table_head %}
+    <tr class="text-center">
+        <td style="width: 5%;">№</td>
+        <td style="width: 5%;">Добавлено</td>
+        <td style="width: 30%;">Адрес объекта</td>
+        <td style="width: 25%;">Контрагент</td>
+        <td style="width: 10%;">{% if status.slug != 'complete' %}Запланировано{% else %}Исполнено{% endif %}</td>
+        <td style="width: 10%;">Исполнитель</td>
+        <td style="width: 10%;">Автор</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in proposals %}
+        <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'build:addget_bproposals' item.id %}')";>
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:i" }}</td>
+            <td>{{ item.AddressObject }}</td>
+            <td>{{ item.Client_choices }}</td>
+            <td class="text-center">
+                {% if status.slug != 'complete' %}
+                    {{ item.DateTime_schedule|date:"d.m.Y" }}
+                {% else %}
+                    {{ item.DateTime_work|date:"d.m.Y" }}
+                {% endif %}
+            </td>
+            <td class="text-center">
+                {% get_coworker_from_acts item.id %}
+            </td>
+            <td class="text-center">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <small> {{ item.Create_user|view_shortfio_user }}</small>
+                {% if item.Update_user %}
+                    <br/>
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                    <small> {{ item.Update_user|view_shortfio_user }}</small>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=proposals %}
+{% endblock %}

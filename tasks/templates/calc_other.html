@@ -1,0 +1,136 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block include_header %}
+    <style>
+        .field {
+            background-color: white;
+            padding: 10px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block content %}
+    <div class="container">
+        <div class="row mb-2">
+            <div class="col-3">
+                Контрагент (контактное лицо)
+            </div>
+            <div class="col-3 field rounded">
+                {{ calc_data.ContactPerson }}
+            </div>
+            <div class="col-2 offset-1 field rounded">
+                {{ calc_data.Phone }}
+            </div>
+            <div class="col-2 offset-1 field rounded">
+                {{ calc_data.Address_email }}
+            </div>
+            <hr/>
+        </div>
+        <div class="row mb-2">
+            <div class="col-3">
+                Тип сигнализации
+            </div>
+            <div class="col-9 rounded field">
+                {% for choice in calc_data.TypeTask.all %}
+                    {% if forloop.counter > 1 %}, {% endif %} {{ choice.Name }}
+                {% endfor %}
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-3">
+                Объект
+            </div>
+            <div class="col-3 rounded field">
+                {{ calc_data.NameObject }}
+            </div>
+            <div class="col-5 offset-1 rounded field">
+                {{ calc_data.AddressObject }}
+            </div>
+            <hr/>
+        </div>
+        <div class="row mb-2">
+            <div class="col-3">
+                Описание
+            </div>
+            <div class="col-9 rounded field">
+                {{ calc_data.Description }}
+            </div>
+            <hr/>
+        </div>
+        <div class="row mb-2">
+            <div class="col-3">
+                Ответственный исполнитель
+            </div>
+            <div class="col-9 rounded field">
+                {{ calc_data.executor }}
+            </div>
+            <hr/>
+        </div>
+        <div class="row">
+            {% if calc_data.Estimate %}
+                <div class="col-3">
+                    {% if materials %}Калькуляция{% else %}Смета{% endif %}
+                </div>
+                <div class="col-6 rounded field">
+                    {% if calc_data.Estimate %}
+                        <a href="{% url 'tasks:get_estimate' calc_data.id %}" target="_blank"> Скачать</a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="col-12 rounded field">
+                    <div class="h4">Калькуляция</div>
+                    <table class="table table-sm">
+                        <thead>
+                        <tr class="text-center">
+                            <th scope="col">#</th>
+                            <th scope="col">Материалы</th>
+                            <th scope="col">Количество</th>
+                            <th scope="col">Стоимость материалов</th>
+                            <th scope="col">Стоимость работ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in materials %}
+                                <tr>
+                                    <th class="text-center pt-3">{{ forloop.counter }}</th>
+                                    <td>{{ item.material.name }}</td>
+                                    <td class="text-center">{{ item.quantity }}</td>
+                                    <td class="text-center">{{ item.material_total }}</td>
+                                    <td class="text-center">{{ item.work_total }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                        <tfoot>
+                            {% if calc_data.commissioning %}
+                                <tr>
+                                    <th colspan="4" class="float-right pt-3">Пусконаладочные работы:</th>
+                                    <td>{{ calc_data.commissioning }} Руб.</td>
+                                </tr>{% endif %}
+                            {% if calc_data.Sale %}
+                                <tr>
+                                    <th colspan="4" class="float-right pt-3">Снижение стоимости работ:</th>
+                                    <td>{{ calc_data.Sale }}%.</td>
+                                </tr>{% endif %}
+                            {% if calc_data.projects %}
+                                <tr>
+                                    <th colspan="4" class="float-right pt-3">Проектные работы:</th>
+                                    <td>{{ calc_data.projects.price }} Руб.</td>
+                                </tr>{% endif %}
+                            {% if calc_data.total_summ %}
+                                <tr>
+                                    <th colspan="4" class="float-right pt-3">Итоговая сумма:</th>
+                                    <td>{{ calc_data.total_summ }} Руб.</td>
+                                </tr>
+                            {% endif %}
+                        </tfoot>
+                    </table>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

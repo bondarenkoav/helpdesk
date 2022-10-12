@@ -1,0 +1,50 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags paginator_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ status|get_status_name }}{% endblock %}
+
+{% block filters_form %}
+    {% bootstrap_form proposals_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False  %}
+{% endblock %}
+
+{% block title_print %}{{ title }} {{ status|get_status_name }}{% endblock %}
+{% block table_head %}
+    <tr class="text-center">
+        <th style="width: 5%;">#</th>
+        <th style="width: 5%;">Добавлено</th>
+        <th style="width: 5%;">№ объекта</th>
+        <th style="width: 20%;">Адрес объекта</th>
+        <th style="width: 30%;">Контрагент</th>
+        <th style="width: 15%;">Объём работ</th>
+        <th style="width: 10%;">Запланировано</th>
+        <th style="width: 10%;">Исполнитель</th>
+    </tr>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in proposals %}
+        <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'maintenance:addget_mproposals' item.Object.id item.id %}')";>
+            <th class="text-center">{{ item.id }}</th>
+            <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:i" }}</td>
+            <td class="text-center">{{ item.Object.NumObject }}</td>
+            <td>{{ item.Object.AddressObject }}</td>
+            <td class="text-center">{{ item.Object.Client_choices }}</td>
+            <td class="text-center">
+                {% for type_secur in item.Object.TypeSecurity.all %}
+                    {{ type_secur.Name }},
+                {% endfor %}
+            </td>
+            <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+            <td class="text-center">
+                {% for cowork in item.CoWorkers.all %}
+                    {{ cowork.id|view_shortfio_coworker }},<br/>
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=proposals %}
+{% endblock %}

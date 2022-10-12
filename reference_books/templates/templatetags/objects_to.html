@@ -1,0 +1,7 @@
+{% for item in objects %}
+    {% if forloop.last %}
+        {{ item.NumObject }}({{ item.AddressObject }})
+    {% else %}
+        {{ item.NumObject }}({{ item.AddressObject }}) ,
+    {% endif %}
+{% endfor %}

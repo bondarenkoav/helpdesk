@@ -1,0 +1,59 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block include_header %}
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper-page mt-0" style="max-width: 1000px;">
+        <form action="{% url 'tasks:fill_materials' calc_data.id %}" method="post" class="form">{% csrf_token %}
+            <div class="row">
+                <div class="col-1 offset-1 float-right">Набор:</div>
+                <div class="col-5">{% bootstrap_field form_fillmaterials.set layout='inline' %}</div>
+                <div class="col-2">{% bootstrap_button "Импорт" button_type="submit" button_class="btn-primary mr-2" %}</div>
+            </div>
+        </form>
+        <hr/>
+        {% if formset %}
+            <form action="{% url 'tasks:addget_materials' calc_data.id %}" method="post" class="form">{% csrf_token %}
+                <div class="row text-center">
+                    <div class="col-1">№</div>
+                    <div class="col-8">Материалы</div>
+                    <div class="col-2">Количество</div>
+                    <div class="col-1">Не продажа</div>
+                </div>
+                <div><hr/></div>
+                {{ formset.management_form }}
+                {% bootstrap_messages %}
+                {% bootstrap_formset_errors formset layout='inline' %}
+                {% for form in formset %}
+                    <div class="row">
+                        <div class="input-group">
+                            <div class="col-1 d-none d-xs-block">
+                                {% bootstrap_field form.id layout='inline' %}
+                            </div>
+                            <div class="col-1 text-center">
+                                {{ forloop.counter }}
+                            </div>
+                            <div class="col-8">{% bootstrap_field form.material layout='inline' %}</div>
+                            <div class="col-2">{% bootstrap_field form.quantity layout='inline' %}</div>
+                            <div class="col-1 text-center">{% bootstrap_field form.material_rent layout='inline' %}</div>
+                        </div>
+                    </div>
+                {% endfor %}
+                <div><hr/></div>
+                <div class="row">
+                    <div class="col-5 float-right">
+                        {% buttons %}
+                            <a class="btn btn-warning mr-2" href="{% url 'tasks:calc_executor' calc_data.id %}" role="button">Вернуться</a>
+                            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary mr-2" %}
+                        {% endbuttons %}
+                    </div>
+                </div>
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

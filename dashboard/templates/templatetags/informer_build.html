@@ -1,0 +1,22 @@
+<div class="mini-stat clearfix bg-success">
+    <div class="row">
+        <div class="col-6" style="color: white;">
+            <h3>Монтаж</h3>
+        </div>
+        <div class="col-6 mini-stat-info text-right text-muted">
+            <dl class="row" style="margin-top: 10px; color: #f5f5f5">
+                <dt class="col-10">В ожидании</dt><dd class="col-2">{% if proposals_open %}{{ proposals_open }}{% else %}0{% endif %}</dd>
+                <dt class="col-10">Назначено</dt><dd class="col-2">{% if proposals_work %}{{ proposals_work }}{% else %}0{% endif %}</dd>
+                <dt class="col-10">Под контролем</dt><dd class="col-2">{% if proposals_control %}{{ proposals_control }}{% else %}0{% endif %}</dd>
+            </dl>
+        </div>
+    </div>
+    <p class="mb-0 m-t-20 text-muted" style="margin-top: -10px; padding-bottom: 0px;">
+        <ul class="list-inline">
+            <li class="list-inline-item"><a href="{% url 'build:get_bproposals' 'open' %}" class="card-link" style="color: #ffffff">Принятые</a></li>
+            <li class="list-inline-item"><a href="{% url 'build:get_bproposals' 'transfer' %}" class="card-link" style="color: #ffffff">Перенесено</a></li>
+            <li class="list-inline-item"><a href="{% url 'build:get_bproposals' 'control' %}" class="card-link" style="color: #ffffff">Контроль</a></li>
+            <li class="list-inline-item"><a href="{% url 'build:get_bproposals' 'complete' %}" class="card-link" style="color: #ffffff">Исполненые</a></li>
+        </ul>
+    </p>
+</div>

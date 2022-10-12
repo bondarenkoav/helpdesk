@@ -1,0 +1,18 @@
+{% load personal_tags %}
+
+<div class="mini-stat clearfix bg-white">
+    <div><h4>ОНЛАЙН</h4></div>
+    <div class="mini-stat-info text-left text-muted">
+        <ul class="list-group list-group-flush">
+            {% if users %}
+                <ul class="user-list">
+                    {% for user in users %}
+                    <li>{{ user|view_shortfio_user }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </ul>
+    </div>
+    <hr/>
+    <div>Активных пользователей: {{ users|length }}</div>
+</div>

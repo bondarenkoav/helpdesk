@@ -1,0 +1,72 @@
+{% load static bootstrap4 personal_tags %}
+
+<div class="topbar-main" style="height: 60px;">
+    <div class="container-fluid">
+
+        <!-- Logo container-->
+        <div class="logo">
+            <!-- Image Logo -->
+            <a href="{% url 'dashboard:index' %}" class="logo">
+                <img src="{% static "img/logo-sm.png" %}" alt="" height="22" class="logo-small">
+                <img src="{% static "img/logo.png" %}" alt="" height="24" class="logo-large">
+            </a>
+        </div>
+        <!-- End Logo container-->
+
+        <div class="menu-extras topbar-custom">
+
+            <ul class="list-inline float-left mb-0 d-none d-sm-block" style="margin-top: 10px; margin-left: 20px;">
+                <form action="{% url 'change_cur_scompany' %}" method="post" class="form">
+                    <div class="input-group input-group-sm">
+                        {% csrf_token %}
+                        {% bootstrap_field form.cur_scompany show_label=False form_group_class='' %}
+                        <div class="input-group-append" style="margin-left: -3px;">
+                            {% bootstrap_button "Сохранить" button_type="submit" button_class="btn btn-outline-light" %}
+                        </div>
+                    </div>
+                </form>
+            </ul>
+
+            <ul class="list-inline float-right mb-0">
+                <!-- User-->
+                <li class="nav-item dropdown" style="margin-top: -10px;">
+                    <a class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <img src="{% if user|get_gender == 'man' %}{% static "img/user_man.png" %}{% else %}{% static "img/user_woman.png" %}{% endif %}" alt="user" class="rounded-circle"> {{ user|view_shortfio_user }}
+                    </a>
+                    <div class="dropdown-menu" style="min-width: 190px;">
+                        <a class="dropdown-item" href="{% url 'profile' %}">
+                            <i class="fa fa-user-o" aria-hidden="true"></i> Профиль
+                        </a>
+                        <a class="dropdown-item" href="{% url 'settings' %}">
+                            <i class="fa fa-sliders" aria-hidden="true"></i> Настройки
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'logout' %}">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i> Выход
+                        </a>
+                    </div>
+                </li>
+                <li class="nav-item dropdown" style="margin-top: -10px;">
+                    <i class="fa fa-bell-o fa-3x fa-border badge"></i>
+                </li>
+            </ul>
+
+            <!-- Messages-->
+            {% comment %}
+            <li class="list-inline-item dropdown notification-list">
+                {% messages_topbar user %}
+            </li>
+            {% endcomment %}
+
+            <!-- notification-->
+            <li class="list-inline-item dropdown notification-list float-right">
+                {% notify_topbar user %}
+            </li>
+
+        </div>
+        <!-- end menu-extras -->
+
+        <div class="clearfix"></div>
+
+    </div> <!-- end container -->
+</div>

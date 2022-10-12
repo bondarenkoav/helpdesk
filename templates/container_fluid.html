@@ -1,0 +1,83 @@
+{% extends 'page.html' %}
+{% load static reference_books_tags %}
+
+{% block include_header %}
+    <style>
+        @media print {
+            table, th, td {
+                border: 1px solid black;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block filters_list %}{% endblock %}
+{% block page_title %}{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block content %}
+    <div style="position: relative; z-index: 2; top: -80px; margin-right: 10px;" class="d-print-none">
+        <div class="float-right">
+            <a href="{% block add_object_url %}{% endblock %}" target="_blank">
+                <i class="fa fa-plus-circle fa-5x pl-lg-4" aria-hidden="true" style="text-shadow: 1px 1px 2px black, 0 0 1em white;"
+                   data-toggle="tooltip" data-placement="left" title="Добавить {% block add_object_name %}{% endblock %}">
+                </i>
+            </a>
+            <span style="width: 30px;"></span>
+            <a href="#" class="btn myprint">
+                <i class="fa fa-print fa-4x" aria-hidden="true" style="text-shadow: 1px 1px 2px black, 0 0 1em white; margin-top: -60px;"
+                   data-toggle="tooltip" data-placement="left" title="Печать списка">
+                </i>
+            </a>
+        </div>
+    </div>
+    <div style="position: relative; z-index: 2; top: -80px; margin-left: 10px;" class="d-print-none">
+        <div class="float-left">
+            <a href="" data-toggle="modal" data-target="#exampleModalCenter">
+                <span class="fa-stack fa-lg">
+                    <i class="fa fa-filter fa-3x"
+                       aria-hidden="true" style="text-shadow: 1px 1px 2px black, 0 0 1em white;"
+                       data-toggle="tooltip" data-placement="left" title="Фильтры">
+                    </i>
+                </span>
+            </a>
+        </div>
+    </div>
+    <div style="position: relative; z-index: 1; top: -92px;">
+        <div class="container-fluid" style="width: 100%; padding-right: 5px; padding-left: 5px;">
+            <script>
+                $(function(){
+                    $('.myprint').click(function(){             //при клике на что срабатывает печать
+                        var html_to_print=$('.to_print').html();    //что печатаем
+                        var iframe=$('<iframe id="print_frame">');
+                        $('body').append(iframe);
+                        var doc = $('#print_frame')[0].contentDocument || $('#print_frame')[0].contentWindow.document;
+                        var win = $('#print_frame')[0].contentWindow || $('#print_frame')[0];
+                        doc.getElementsByTagName('body')[0].innerHTML=html_to_print;
+                        win.print();
+                        $('iframe').remove();
+                    });
+                });
+            </script>
+            <style>#print_frame{display: none;}</style>
+            <div class='to_print'>
+                <h4 id="print_title" class="d-none">{% block title_print %}{% endblock %}</h4>
+                <table class="table table-sm">
+                    <thead>
+                        <tr class="text-center">
+                            {% block table_head %}
+                            {% endblock %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% block table_body %}
+                        {% endblock %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block url_pagination %}{% endblock %}
+{% block include_footer %}{% endblock %}

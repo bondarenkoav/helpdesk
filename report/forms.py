@@ -1,11 +1,6 @@
 import datetime
 from django import forms
 from django.contrib.admin.widgets import AdminDateWidget
-from django.forms import CheckboxInput
-from django.forms.extras import SelectDateWidget
-from build.models import acts_build
-from reference_books import models
-from reference_books.models import CoWorker, ExpandedUserProfile
 
 __author__ = 'ipman'
 
@@ -48,7 +43,15 @@ __author__ = 'ipman'
 #         model = CoWorker
 #         fields = ['CoWorkers']
 
+KIND_CHOICES = (
+    ('by_date', u'по дате'),
+    ('by_cowork', u'по исполнителю'),
+)
 
 class coworkers_range_date(forms.Form):          # Вывести: кто где работал в течении заданного периода и за один день
-    acts_date_start = forms.DateField(label='Дата начала', widget=AdminDateWidget, initial=datetime.date.today)
-    acts_date_stop  = forms.DateField(label='Дата окончания', widget=AdminDateWidget, initial=datetime.date.today)
+    kind = forms.ChoiceField(required=True, label="Статус", choices=KIND_CHOICES,
+                             widget=forms.Select(attrs={'class':'selector'}))
+    acts_date_start = forms.DateField(required=True, label='Дата начала', initial=datetime.datetime.today(),
+                                      widget=forms.DateInput(format='%Y-%m-%d',attrs={'type':'date'}), input_formats=('%Y-%m-%d', ))
+    acts_date_stop  = forms.DateField(required=False, label='Дата окончания', help_text='Указываем последний день обслуживания',
+                                      widget=forms.DateInput(format='%Y-%m-%d',attrs={'type':'date'}), input_formats=('%Y-%m-%d', ))

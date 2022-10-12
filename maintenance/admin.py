@@ -1,19 +1,17 @@
 from django.contrib import admin
+from maintenance.models import mobjects, mproposals
 
-# Register your models here.
-from maintenance.models import  objects_to, maintenance_request # Status_object,
 
 class MaintenanceRequestAdmin(admin.ModelAdmin):
-    list_display = ['Object','DateTime_schedule','DateTime_work','Status','DateTime_add']
-    list_filter = ['DateTime_schedule','DateTime_work','Status']
+    list_display = ['Object', 'DateTime_schedule', 'DateTime_work', 'DateTime_add']
+    list_filter = ['DateTime_schedule', 'DateTime_work', 'Status', 'CoWorkers']
 
-class Status_objectAdmin(admin.ModelAdmin):
-    list_display = ['Name','slug']
 
 class ObjectTOAdmin(admin.ModelAdmin):
-    list_display = ['NumObject','AddressObject','DateTime_add','Status','Client','ServingCompany']
-    list_filter = ['DateTime_add','Status']
+    list_display = ['NumObject', 'AddressObject', 'DateTime_add', 'Client_choices', 'ServiceCompany']
+    list_filter = ['DateTime_add', 'ServiceCompany', 'Month_schedule', 'Status_object']
 
-#admin.site.register(Status_object, Status_objectAdmin)
-admin.site.register(objects_to, ObjectTOAdmin)
-admin.site.register(maintenance_request, MaintenanceRequestAdmin)
+
+
+admin.site.register(mobjects, ObjectTOAdmin)
+admin.site.register(mproposals, MaintenanceRequestAdmin)

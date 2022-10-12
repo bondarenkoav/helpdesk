@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% load personal_tags %}
+
+    {% block title %}Заявка на {{ filter }}{% endblock %}
+
+    {% block title_body %}
+
+    {% endblock %}
+
+    {% block title_body_h1 %}Список исполнителей по объектам{% endblock %}
+    {% block title_body_small %}с {{ acts_date_start }} по {{ acts_date_stop }}{% endblock %}
+
+    {% block content %}
+        <div class="container panel panel-default noprint">
+            <div class="panel-body">
+                <form action="/build/coworker_range_date/" method="post" class="form">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-xs-10">
+                            {% bootstrap_form form layout='horizontal' %}
+                        </div>
+                        <div class="col-xs-2">
+                            {% buttons %}
+                                <button type="submit" class="btn btn-primary text-center">Вывести</button>
+                            {% endbuttons %}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div>
+            <dl class="dl-horizontal">
+                <dt>Список объектов</dt>
+                <dd>
+                    <ol>
+                        {% for item in request %}
+                            <li>
+                                {{ forloop.counter }}
+                                {{ item.support_request.id }}
+                                {{ item.support_request.AddressObject }}
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </dd>
+                <dt>Список актов:</dt>
+                <dd>
+                    <ol>
+                        {% for item in acts %}
+                            <li>
+                                {{ forloop.counter }}
+                                {{ item.Day_reporting }}
+                                {{ item.support_request.AddressObject }}
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </dd>
+                <dt>Смонтировал объектов:</dt>
+                <dd>...</dd>
+                <dt>Участвовал объектов:</dt>
+                <dd>...</dd>
+
+            </dl>
+        </div>
+    {% endblock %}

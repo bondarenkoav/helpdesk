@@ -1,26 +1,18 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% load bootstrap3 %}
+{% extends 'template_item.html' %}
 
-{% block title_body_h1 %}Список моделей передатчиков{% endblock %}
+{% block page_title %}Передатчик{% endblock %}
+{% block section_active %}
+    {% if transmitter_data %}
+        {{ transmitter_data.Name }} {{ transmitter_data.Name }}
+    {% else %}
+        новая
+    {% endif %}
+{% endblock %}
 
-{% block content %}
-    <div class="container">
-        <div class="panel panel-default">
-            <div class="panel-body">
-
-                <form action="/reference_books/transmitters/item/{{ transmitter_id }}/" method="post" class="form">
-                    {% csrf_token %}
-                    {% bootstrap_form form layout='horizontal' %}
-                    {% buttons %}
-                        <button type="submit" class="btn btn-primary" style="margin-top: 10px;">
-                            Сохранить
-                        </button>
-                    {% endbuttons %}
-                </form>
-
-            </div>
-        </div>
-    </div>
-
+{% block add_object_url %}
+    {% if transmitter_data %}
+        {% url 'reference_books:addget_transmitter' transmitter_data.id %}
+    {% else %}
+        {% url 'reference_books:addget_transmitter' %}
+    {% endif %}
 {% endblock %}

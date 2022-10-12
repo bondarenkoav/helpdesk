@@ -1,0 +1,99 @@
+{% load personal_tags %}
+
+{% if list_build or list_exploitation or list_maintenance %}
+    <div class="panel panel-default">
+        <!-- Default panel contents -->
+        <div class="panel-heading">{{ date }}</div>
+
+        <!-- Table -->
+        <table class="table">
+            <thead>
+                <tr class="text-center">
+                    <td style="width: 20%;">Дата</td>
+                    <td style="width: 50%;">Объект</td>
+                    <td style="width: 30%;">Исполнители</td>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Монтаж -->
+                {% if list_build %}
+                    <tr>
+                        <td colspan="2">
+                            <strong>Монтаж</strong>
+                        </td>
+                    </tr>
+                    {% for item_build in list_build %}
+                        <tr>
+                            <td class="text-center">{{ item_build.Day_reporting }}</td>
+                            <td class="text-center">{{ item_build.proposal.Client.Name }} ({{ item_build.proposal.AddressObject }})</td>
+                            <td>
+                                {% for cowork in item_build.CoWorkers.all %}
+                                    {{ cowork.Person_FIO }},
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_build|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+                {% if list_maintenance %}
+                    <tr>
+                        <td colspan="2"><strong>Техническое обслуживание</strong></td>
+                    </tr>
+                    {% for item_maintenance in list_maintenance %}
+                        <tr>
+                            <td class="text-center">{{ item_maintenance.DateTime_work }}</td>
+                            <td class="text-center">{{ item_maintenance.Object.Client }} ({{ item_maintenance.Object.AddressObject }})</td>
+                            <td>
+                                {% for cowork in item_maintenance.CoWorkers.all %}
+                                    {{ cowork.Person_FIO }},
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_maintenance|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+                {% if list_exploitation %}
+                    <tr>
+                        <td colspan="2">
+                            <strong>Эксплуатация</strong>
+                        </td>
+                        <td>
+                            {% if coworker %}
+                                <a target="_blank" href="{% url 'exploitation:export_toexcel_eproposals' coworker.id date_start|date:"dmY" date_end|date:"dmY" %}">
+                                    <i class="fa fa-arrow-right" aria-hidden="true">
+                                        <i class="fa fa-file-excel-o fa-2x" aria-hidden="true"></i>
+                                    </i>
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% for item_exploitation in list_exploitation %}
+                        <tr>
+                            <td class="text-center">{{ item_exploitation.DateTime_work}}</td>
+                            <td class="text-center">
+                                {% if item_exploitation.Client_bd != None %}
+                                    {{ item_exploitation.Client_bd }}
+                                {% else %}
+                                    {{ item_exploitation.Client }}
+                                {% endif %}
+                                ({{ item_exploitation.NumObject }} - {{ item_exploitation.AddressObject }})
+                            </td>
+                            <td>
+                                {% for cowork in item_exploitation.CoWorkers.all %}
+                                    {{ cowork.Person_FIO }}
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_exploitation|length }} объекта(ов)</td>
+                    </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

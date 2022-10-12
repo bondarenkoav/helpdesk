@@ -1,0 +1,92 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 %}
+
+{% block include_header %}
+    <!-- DaData -->
+    <link rel="stylesheet" href="{% static "css/suggestions-15.12.css" %}">
+
+    <!-- Choosen select -->
+    <link rel="stylesheet" href="{% static "css/prism.css" %}">
+    <link rel="stylesheet" href="{% static "css/chosen.min.css" %}">
+{% endblock %}
+
+{% block page_title %}Заявка на ТО{% endblock %}
+{% block section_active %}
+    {% if request_data %}
+        Заявка №{{ request_data.id }}
+    {% else %}
+        Новая
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <h3>Объект:
+            {% if proposal_data %}
+                {{ proposal_data.Object.NumObject }} - {{ proposal_data.Object.AddressObject }} ({{ proposal_data.Object.Client.Name }})
+            {% else %}
+                {{ object_data.NumObject }} - {{ object_data.AddressObject }} ({{ object_data.Client.Name }})
+            {% endif %}
+        </h3>
+
+        <form action="{% if proposal_data %}{% url 'maintenance:addget_mproposals' proposal_data.Object.id proposal_data.id %}{% else %}{% url 'maintenance:addget_mproposals' object_data.id %}{% endif %}" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form_errors form %}
+            <div class="form-group row">
+                <div class="col-3" style="padding-top: 5px;">
+                    {% bootstrap_label "Запланировано на" label_for="Date_start" %}
+                </div>
+                <div class="col-3">
+                    {% bootstrap_field form.DateTime_schedule layout='inline' %}
+                </div>
+                <div class="col-6">
+                    {% bootstrap_field form.Status layout='horizontal' %}
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3" style="padding-top: 5px;">
+                    {% bootstrap_label "Выполнено" label_for="Date_start" %}
+                </div>
+                <div class="col-3">
+                    {% bootstrap_field form.DateTime_work layout='inline' %}
+                </div>
+                <div class="col-6">
+                    {% bootstrap_field form.DescriptionWorks layout='inline' %}
+                </div>
+            </div>
+            <div class="form-group row">
+                <div class="col-3" style="padding-top: 5px;">
+                    {% bootstrap_label "Исполнитель" label_for="CoWorkers" %}
+                </div>
+                <div class="col-7">
+                    {% bootstrap_field form.CoWorkers layout='inline' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block include_footer %}
+    <!-- DaData -->
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+    <script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+
+    <!-- Choosen select -->
+    <script src="{% static "js/chosen.jquery.min.js" %}" type="text/javascript"></script>
+    <script src="{% static "js/prism.js" %}" type="text/javascript" charset="utf-8"></script>
+    <script type="text/javascript">
+        var config = {
+            '.chosen-select'           : {},
+            '.chosen-select-deselect'  : {allow_single_deselect:true},
+            '.chosen-select-no-single' : {disable_search_threshold:10},
+            '.chosen-select-no-results': {no_results_text:'Упс, не найдено!'},
+            '.chosen-select-width'     : {width:"95%"}
+        }
+        for (var selector in config) {
+            $(selector).chosen(config[selector]);
+        }
+    </script>
+{% endblock %}

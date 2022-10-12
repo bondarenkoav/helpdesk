@@ -1,0 +1,57 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags paginator_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block filters_form %}
+    {% bootstrap_form task_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False  %}
+{% endblock %}
+
+{% block add_object_url %}{% url 'tasks:addget_task' %}{% endblock %}
+{% block add_object_name %}задачу{% endblock %}
+
+{% block table_head %}
+    <td style="width: 5%;">№</td>
+    <td style="width: 45%;">Задача</td>
+    <td style="width: 20%;">Срок исполнения</td>
+    <td style="width: 10%;">Статус</td>
+    <td style="width: 10%;">Исполнитель</td>
+    <td style="width: 10%;">Автор</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in tasks %}
+        <tr class="table-{% if item.status.slug == 'open' or item.status.slug == 'work' and item.Date_limit >= cur_date %}danger{% else %}{{ item.status.class_b4 }}{% endif %}" id="obj_{{ item.id }}" onclick="location.href = '{% url 'tasks:addget_task' item.id %}';">
+            <th scope="row" class="{% if item.high_importance == True %}bg-warning{% endif %} text-center">
+                <h2>{{ item.id }}</h2>
+            </th>
+            <td>
+                {{ item.title }}<br>
+                <small>{{ item.description|truncatechars:50 }}</small>
+            </td>
+            <td class="text-center">
+                {{ item.Date_limit }}<br/>
+                {% if item.Date_limit < cur_date and item.status.slug == 'open' or item.status.slug == 'work' %}
+                    Внимание! Время выполнения задачи просрочено
+                {% elif item.Date_limit == cur_date %}
+                    Внимание! Лимит времени отведенный на выполнение данной задачи подходит к концу
+                {% else %}
+                    {{ item.status.name }}
+                {% endif %}
+            </td>
+            <td class="text-center">{{ item.status }}</td>
+            <td class="text-center">
+                {% if item.executor %}{{ item.executor }}
+                {% else %}{{ item.group_executor }}
+                {% endif %}
+            </td>
+            <td class="text-center">{{ item.author|view_shortfio_user }} <br/><small>{{ item.DateTime_add }}</small></td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% comment %}
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=tasks %}
+{% endblock %}{% endcomment %}

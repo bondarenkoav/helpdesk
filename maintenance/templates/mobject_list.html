@@ -1,0 +1,64 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 paginator_tags %}
+
+{% block page_title %}Объекты ТО{% endblock %}
+{% block section_active %}
+    {% if status == 'work' %}
+        обслуживаемые
+    {% else %}
+        не обслуживаемые
+    {% endif %}
+{% endblock %}
+
+{% block add_object_url %}{% url 'maintenance:addget_mobjects' %}{% endblock %}
+{% block add_object_name %}объект{% endblock %}
+
+{% block filters_form %}
+    {% bootstrap_form objects_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False %}
+{% endblock %}
+
+{% block title_print %}Объекты ТО {% if status == 'work' %}обслуживаемые{% else %}не обслуживаемые{% endif %}{% endblock %}
+{% block table_head %}
+    <tr class="text-center">
+        <td style="width: 5%;">#</td>
+        <td style="width: 5%;">№</td>
+        <td style="width: 30%;">Адрес объекта</td>
+        <td style="width: 20%;">Контрагент</td>
+        <td style="width: 10%;">Тип сигнализации</td>
+        <td style="width: 15%;">Маршрут</td>
+        <td style="width: 15%;">Период</td>
+    </tr>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in objects %}
+        <tr id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'maintenance:addget_mobjects' item.id %}')">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.NumObject }}</td>
+            <td class="text-right">{{ item.AddressObject }}</td>
+            <td>{{ item.Client_choices }}</td>
+            <td class="text-center">
+                {% for type in item.TypeSecurity.all %}
+                    {{ type.Name }},
+                {% endfor %}
+            </td>
+            <td class="text-right">
+                {% if item.Routes %}
+                    {{ item.Routes.Descript }}
+                {% else %}
+                    <code>не определён</code>
+                {% endif %}
+            </td>
+            <td class="text-center">
+                {{ item.Year_schedule }}
+                {% for month in item.Month_schedule.all %}
+                    {{ month.Month_num }},
+                {% endfor %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=objects %}
+{% endblock %}

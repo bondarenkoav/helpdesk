@@ -1,0 +1,33 @@
+<a class="nav-link dropdown-toggle arrow-none waves-effect" data-toggle="dropdown" role="button" aria-haspopup="false" aria-expanded="false">
+    <i class="mdi mdi-bell-outline noti-icon"></i>
+    <span class="badge badge-danger noti-icon-badge">{{ count_notify }}</span>
+</a>
+
+<div class="dropdown-menu dropdown-menu-right dropdown-arrow dropdown-menu-lg" x-placement="bottom-end" style="position: absolute; transform: translate3d(52px, 60px, 0px); top: 0px; left: 0px; will-change: transform;">
+    {% for item in notify %}
+        <a href="{% url 'tasks:get_notify_calc' item.id %}" class="dropdown-item notify-item {% if item.read == False %}active{% endif %}">
+            <div class="notify-icon bg-{% if item.Date_limit == cur_date %}danger{% else %}success{% endif %}">
+                <i class="mdi mdi-{% if item.status.slug == 'complete' %}check-outline{% elif item.status.slug == 'open' %}alert-circle-outline{% else %}av-timer{% endif %}"></i>
+            </div>
+            <p class="notify-details">
+                <b>{{ item.title }}</b>
+                <small class="text-muted">{{ item.description }}</small>
+            </p>
+        </a>
+    {% endfor %}
+    {% for item in tasks %}
+        <a href="{% url 'tasks:addget_task' item.id %}" class="dropdown-item notify-item {% if item.read == False %}active{% endif %}">
+            <div class="notify-icon bg-{% if item.Date_limit == cur_date %}danger{% else %}success{% endif %}">
+                <i class="mdi mdi-{% if item.status.slug == 'complete' %}check-outline{% elif item.status.slug == 'open' %}alert-circle-outline{% else %}av-timer{% endif %}"></i>
+            </div>
+            <p class="notify-details">
+                <b>{{ item.title }}</b>
+                <small class="text-muted">{{ item.description }}</small>
+            </p>
+        </a>
+    {% endfor %}
+    <!-- All-->
+    <a href="{% url 'tasks:getlist_tasks' %}" class="dropdown-item notify-item">
+        Смотреть все
+    </a>
+</div>

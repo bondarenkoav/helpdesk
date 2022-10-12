@@ -1,0 +1,50 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags paginator_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}
+    {% if status == 'active' %}
+        активные
+    {% else %}
+        не активные
+    {% endif %}
+{% endblock %}
+
+{% block add_object_url %}{% url 'simmanage:addget_simcard' %}{% endblock %}
+{% block add_object_name %}заявку{% endblock %}
+
+dic = {
+    # согласно логике, если ячейка пустая, то лучше бы об этом предупредить явно,
+    # чем надеятся что Python угадает
+    'columns': [None, 'one', 'two', 'three'],
+    'headers': ['header1', 'header2', 'header3', 'header4'],
+    'data': [
+        ['111', '222', '333'],
+        ['111', '222', '333'],
+        ['111', '222', '333'],
+        ['111', '222', '333']
+    ]
+}
+Преобразуем headers и data в headers[i] + data[i].
+Исчерпывающее руководство по map и zip
+http://ninjaside.info/blog/ru/funkcii-map-i-zip-i-lambda-python/
+
+rows = [dic['columns']] + list(map(lambda x: [x[0], *x[1]], zip(dic['headers'], dic['data'])))
+Разберем по шагам эту строчку:
+
+zip(dic['headers'], dic['data']) объединяем два массива в map его вид будет [['header1', ['111', '222', '333']], ...]
+Создаем объект map по шаблону lambda x: [x[0], *x[1]], x[0] - это 'header1', *x[1] (звездочка впереди означает что мы передаем объекты списка, а не сам список), соответственно '111', '222', '333'.
+Складываем [dic['columns']] и map, (конвертируем его прежде в list)
+В шаблоне указываем нашу таблицу:
+
+<table>
+    {% for row in rows %}
+        <tr>
+            {% for col in row %}
+                <td>
+                    {% if col %}{{ col }}{% endif %}
+                </td>
+            {% endfor %}
+        </tr>
+    {% endfor %}
+</table>

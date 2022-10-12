@@ -1,0 +1,30 @@
+{% extends 'container.html' %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}Справочники{% endblock %}
+{% block add_object_url %}{% url url_addget %}{% endblock %}
+{% block add_object_name %}тариф{% endblock %}
+
+{% block table_head %}
+    <td style="width: 10%;">#</td>
+    <td style="width: 15%;">Сотовый оператор</td>
+    <td style="width: 20%;">Наименование тарифа</td>
+    <td style="width: 15%;">Стоимость, руб.</td>
+    <td style="width: 50%;">Описание</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in list %}
+        <tr id="obj_{{ item.id }}" onclick="location.href = '{% url url_addget item.id %}';">
+            <td class="text-center">{{ item.id }}</td>
+            <td>{{ item.OpSoSName.Name }}</td>
+            <td>{{ item.Rate }}</td>
+            <td>{{ item.price }} </td>
+            <td>{{ item.Descript }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

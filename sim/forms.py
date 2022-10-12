@@ -1,81 +1,77 @@
-from time import strptime
-from sim.models import OpSoS_card, UseTypeSIM
+import os
+
+from django.core.exceptions import ValidationError
 
 __author__ = 'ipman'
 
-import datetime
-from django.contrib.admin.widgets import AdminDateWidget
+from sim.models import OpSoS_card
 from django import forms
-from django.forms import ModelForm, SplitDateTimeWidget, CheckboxInput, modelformset_factory
+from django.forms import ModelForm, Form
+from reference_books.models import SystemPCN
+from accounts.views import get_cur_scompany, get_scompany
 
 
 class get_new_simcard(ModelForm):
+
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
         super(get_new_simcard, self).__init__(*args, **kwargs)
         instance = getattr(self, 'instance', None)
+        Company = get_scompany(self.user)
+        Company_cur = get_cur_scompany(self.user)
 
         if instance and instance.id:
-            data = OpSoS_card.objects.get(id=instance.id)
-            # self.fields['OpSoSRate'].required = False
-            # self.fields['OpSoSRate'].widget.attrs['disabled'] = 'disabled'
+            self.fields['Number_SIM'].widget.attrs['id'] = ''
             self.fields['Number_SIM'].required = False
             self.fields['Number_SIM'].widget.attrs['disabled'] = 'disabled'
-            self.fields['ICC_SIM'].required = False
-            self.fields['ICC_SIM'].widget.attrs['disabled'] = 'disabled'
-            # self.fields['Owner'].required = False
-            # self.fields['Owner'].widget.attrs['disabled'] = 'disabled'
-            # self.fields['PersonalAccount'].required = False
-            # self.fields['PersonalAccount'].widget.attrs['disabled'] = 'disabled'
-            # self.fields['Contract'].required = False
-            # self.fields['Contract'].widget.attrs['disabled'] = 'disabled'
-            # self.fields['Contract_date'].required = False
-            # self.fields['Contract_date'].widget.attrs['disabled'] = 'disabled'
-
-            if data.Status == False:
-                self.fields['Status'].required = False
-                self.fields['Status'].widget.attrs['disabled'] = 'disabled'
+            self.fields['ServiceCompany'].required = False
+            self.fields['ServiceCompany'].widget.attrs['disabled'] = 'disabled'
         else:
-            pass
+            self.fields['Use_type'].initial = 'usesim_none'
+            self.fields['ServiceCompany'].queryset = Company
+            self.fields['ServiceCompany'].initial = Company_cur.id
 
-    Number_SIM          = forms.CharField(required=False, label=u'Номер сим-карты', widget=forms.widgets.TextInput(attrs={'id':'phone_mobile'}))
-    ICC_SIM             = forms.CharField(required=False, label=u'ID сим-карты', widget=forms.widgets.TextInput(attrs={'id':'id_sim'}))
-    Contract_date       = forms.DateField(label='Дата заключения', widget=AdminDateWidget, initial=datetime.date.today)
-    Notation            = forms.CharField(required=False, label='Примечание', widget=forms.widgets.Textarea(attrs={'rows':3}))
-    Use_type            = forms.ModelChoiceField(required=True, label='Тип использования', queryset = UseTypeSIM.objects.all(),
-                                                 help_text='Выберите тип применения и заполните доступное поле/поля ниже',
-                                                 widget=forms.Select(attrs={'class':'selector','onchange':'hideInputTypeUseSIM(this)'}))
-    Use_numberobject    = forms.CharField(required=False, label='№ объекта', widget=forms.widgets.TextInput())       #(attrs={'disabled':'disabled'}))
-    Use_nameobject      = forms.CharField(required=False, label='Наименование объекта', widget=forms.widgets.TextInput())   #(attrs={'disabled':'disabled'}))
-    Use_addressobject   = forms.CharField(required=False, label='Адрес объекта', widget=forms.widgets.TextInput())     #(attrs={'disabled':'disabled'}))
-    Use_user            = forms.CharField(required=False, label='ФИО пользователя', widget=forms.widgets.TextInput())   #(attrs={'disabled':'disabled'}))
+        self.fields['Use_type'].widget.attrs['onchange'] = 'hideInputTypeUseSIM(this)'
+
+    Number_SIM = forms.CharField(label=u'Номер сим-карты',
+                                 widget=forms.widgets.TextInput(attrs={'id': 'id_phone_mobile'}))
+    ICC_SIM = forms.CharField(label=u'ID сим-карты', widget=forms.widgets.TextInput())
+    Contract_date = forms.DateField(required=True, label='Дата заключения', input_formats=('%Y-%m-%d',),
+                                    widget=forms.DateInput(format='%Y-%m-%d', attrs={'type': 'date'}))
+    Notation = forms.CharField(required=False, label='Примечание', widget=forms.widgets.Textarea(attrs={'rows': 3}))
+    SystemPCN = forms.ModelChoiceField(required=True, label='Тип использования', queryset=SystemPCN.objects.all(),
+                                       help_text='Выберите тип применения и заполните доступное поле/поля ниже',
+                                       widget=forms.Select())
+    Use_numberobject = forms.CharField(required=False, label='№ объекта', widget=forms.widgets.TextInput())
+    Use_nameobject = forms.CharField(required=False, label='Наименование объекта', widget=forms.widgets.TextInput())
+    Use_addressobject = forms.CharField(required=False, label='Адрес объекта',
+                                        widget=forms.widgets.TextInput(attrs={'id': 'id_AddressObject'}))
+    Use_user = forms.CharField(required=False, label='ФИО пользователя',
+                               widget=forms.widgets.TextInput(attrs={'id': 'id_Person_FIO'}))
 
     class Meta:
         model = OpSoS_card
-        fields = ['OpSoSRate','Number_SIM','ICC_SIM','SystemPCN','Contract','Owner','Contract_date','PersonalAccount','Status',
-                  'Use_type','Use_numberobject','Use_nameobject','Use_addressobject','Use_user','Notation']
+        fields = ['OpSoSRate', 'Number_SIM', 'ICC_SIM', 'SystemPCN', 'Contract', 'ServiceCompany', 'Contract_date',
+                  'PersonalAccount', 'Status', 'archive',
+                  'Use_type', 'Use_numberobject', 'Use_nameobject', 'Use_addressobject', 'Use_user', 'Notation']
 
-    # def clean(self):
-    #     cleaned_data = super(get_new_simcard, self).clean()
-    #     full_name = cleaned_data['full_name']
-    #     passport_sernum = cleaned_data['passport_sernum']
-    #
-    #     if full_name and passport_sernum:
-    #         if re.match(r"^[А-Яа-я]{3,}\s[А-Яа-я]{3,}\s[А-Яа-я]{3,}",full_name) == None:
-    #             raise forms.ValidationError(u'Ошибка: ФИО должно быть полным')
-    #
-    #         # Проверка паспортных данных
-    #         if re.match(r"^([0-9]{4})\s{1}([0-9]{6})$",passport_sernum) == None:
-    #             raise forms.ValidationError(u'Введите серию и номер паспорта в формате ХХХХ ХХХХХХ')
-    #
-    #         if not self.errors:
-    #             self.full_name = full_name
-    #             self.passport_sernum = passport_sernum
-    #
-    #             client = Branch.objects.filter(Client__in=Client.objects.filter(NameClient_full=full_name,PassportSerNum=passport_sernum))
-    #             if client:
-    #                 if client.count() > 1:
-    #                     raise forms.ValidationError(u'В базе данных обнаружен дубликат контрагента')
-    #                 self.client = Branch.objects.get(Client=Client.objects.get(NameClient_full=full_name,PassportSerNum=passport_sernum))
-    #             else:
-    #                 self.client = None
-    #         return cleaned_data
+    def clean(self):
+        cleaned_data = super(get_new_simcard, self).clean()
+        icc_sim = cleaned_data['ICC_SIM']
+        #usetype = cleaned_data.get('Use_type')
+        #useuser = cleaned_data['Use_user']
+        # usenumobject = cleaned_data['Use_numberobject'].replace('', '')
+        # usenameobject = cleaned_data['Use_nameobject'].replace(' ', '')
+        # useaddressobject = cleaned_data['Use_addressobject'].replace(' ', '')
+
+        if not self.errors:
+            if self.instance.id is None:
+                if icc_sim.isdigit() is False:
+                    raise forms.ValidationError(u'Идентификационный код сим-карты состоит только из цифр')
+                # if usetype == 'usesim_user':
+                #    if useuser.isalpha() == False:
+                #        raise forms.ValidationError(u'Поле ФИО должно содержать только буквы')
+                # elif usetype == 'usesim_object':
+                #    if usenumobject.isalnum() == False or usenameobject.isalnum() == False:
+                #        raise forms.ValidationError(u'Поля данных по объекту не должны содержать спецсимволы')
+        return cleaned_data

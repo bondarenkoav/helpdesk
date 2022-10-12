@@ -1,0 +1,26 @@
+{% extends 'container.html' %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}Справочники{% endblock %}
+{% block add_object_url %}{% url url_addget %}{% endblock %}
+{% block add_object_name %}передатчик{% endblock %}
+
+{% block table_head %}
+    <td style="width: 5%;">#</td>
+    <td style="width: 50%;">Наименование</td>
+    <td style="width: 45%;">ПЦН</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in list %}
+        <tr id="obj_{{ item.id }}" onclick="location.href = '{% url url_addget item.id %}';">
+            <td class="text-center">{{ item.id }}</td>
+            <td>{{ item.Name }}</td>
+            <td>{{ item.SystemPCN }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=list %}
+{% endblock %}

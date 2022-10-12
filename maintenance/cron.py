@@ -1,95 +1,89 @@
-import datetime, calendar
-from django.core.mail import send_mail
-from django.http import HttpResponseRedirect
-from django.template import Context, Template
-from maintenance.models import objects_to, maintenance_request, Status_object
-from reference_books.models import Numerate, Company, Send_mail_list, ExpandedUserProfile, Status
-from request.settings import EMAIL_HOST_USER
-from django.utils.safestring import mark_safe
-
 __author__ = 'ipman'
 
-def cron_close_maintenance_object():            # Автоматическое снятие объектов с ТО
+import datetime
+import calendar
+
+from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.shortcuts import redirect
+from django.template import Context, Template
+from django.utils.safestring import mark_safe
+from helpdesk.settings import EMAIL_HOST_USER
+
+from maintenance.models import mobjects, mproposals
+from reference_books.models import ServiceCompanies, Send_mail_list, Status, TypeRequest, TypeDocument
+
+
+# Автоматическое снятие объектов с ТО
+def cron_close_maintenance_object():
     now_date = datetime.date.today()
-    objects_to.objects.filter(Date_close__lt=now_date,Status=Status_object.objects.get(slug='open')).update(Status=Status_object.objects.get(slug='close'))
-    return HttpResponseRedirect('/')
+    objects = mobjects.objects.filter(Date_end__lt=now_date, Status_object=True)
+    objects.update(Status_object=False)
 
-def cron_create_maintenance_request():           # Создаёт заявки 1 числа каждого месяца
 
+# Создаёт заявки 1 числа каждого месяца
+def cron_create_maintenance_request():
+    now_date = datetime.date.today()
+    # cur_month = now_date.month
+    get_objects_cur_month = mobjects.objects.filter(Month_schedule=now_date.month, Status_object=True)
+
+    for object_item in get_objects_cur_month:
+        mproposals.objects.create(
+            TypeRequest=TypeRequest.objects.get(slug='maintenance'),
+            TypeDocument=TypeDocument.objects.get(slug='request'),
+            Object=object_item, DateTime_schedule=now_date, Create_user=User.objects.get(username='system')
+        )
+
+
+# Создаёт заявки 1го числа каждого месяца вручную
+def cron_create_maintenance_request_manual(request):
     now_date = datetime.date.today()
     cur_month = now_date.month
-    status_open = Status_object.objects.get(slug='open').id
-    get_objects_cur_month = objects_to.objects.filter(Month_schedule=cur_month, Status=status_open)
+    get_objects_cur_month = mobjects.objects.filter(Month_schedule=cur_month, Status_object=True)
 
-    for object in get_objects_cur_month:
-        object_id = objects_to.objects.get(id=object.id)
-        type_list = ''
-        for type in object.TypeSecurity.all():
-            if type_list == '':
-                type_list = type.__str__()
-            else:
-                type_list = type_list+', '+type.__str__()
-
-        p = maintenance_request(
-            Object            = object_id,
-            TypeSecurity      = type_list,
-            Create_user       = object.Create_user,
-            DateTime_schedule = now_date
+    for object_item in get_objects_cur_month:
+        mproposals.objects.create(
+            TypeRequest=TypeRequest.objects.get(slug='maintenance'),
+            TypeDocument=TypeDocument.objects.get(slug='request'),
+            Object=object_item, DateTime_schedule=now_date, Create_user=User.objects.get(username='system')
         )
-        p.save(force_insert=True)
+    return redirect('dashboard:index')
 
-    return HttpResponseRedirect('/')
 
-def cron_create_maintenance_request_manual(request):  # Создаёт заявки 1 числа каждого месяца
-
-    now_date = datetime.date.today()
-    cur_month = now_date.month
-    status_open = Status_object.objects.get(slug='open').id
-    get_objects_cur_month = objects_to.objects.filter(Month_schedule=cur_month, Status=status_open)
-
-    for object in get_objects_cur_month:
-        object_id = objects_to.objects.get(id=object.id)
-        type_list = ''
-        for type in object.TypeSecurity.all():
-            if type_list == '':
-                type_list = type.__str__()
-            else:
-                type_list = type_list+', '+type.__str__()
-
-        p = maintenance_request(
-            Object            = object_id,
-            TypeSecurity      = type_list,
-            Create_user       = object.Create_user,
-            DateTime_schedule = now_date
-        )
-        p.save(force_insert=True)
-
-    return HttpResponseRedirect('/')
-
-def cron_sendmail_maintenance_request():         # Напоминает о не закрытых заявках 20,25-31 число каждого месяца
-    args = {}
+# Напоминает о не закрытых заявках 20,25-31 число каждого месяца
+def cron_sendmail_maintenance_request():
     status_id = Status.objects.get(slug='open').id
 
-    for company in Company.objects.all():                                               # Запрашиваем список сервисных компаний
-        for recipient in Send_mail_list.objects.filter(ServingCompany=company.id):      # Запрашиваем список получателей одной компании
+    # Запрашиваем список сервисных компаний
+    for company in ServiceCompanies.objects.all():
+        # Запрашиваем список получателей одной компании
+        for recipient in Send_mail_list.objects.filter(ServiceCompany=company.id):
 
             recipient_list = ''
-            for item in recipient.Destination.all():                                    # Сформировали список получателей
+            # Сформировали список получателей
+            for item in recipient.Destination.all():
                 if recipient_list == '':
                     recipient_list = item.__str__()
                 else:
                     recipient_list = recipient_list+', '+item.__str__()
-
-            now_date = datetime.date.today()                                            # Получили текущую дату
-            cur_month = now_date.month                                                  # Получили текущий месяц
-            count_day_cur_month = calendar.mdays[datetime.date.today().month]           # Получили количество дней в месяце
-            list_object = objects_to.objects.filter(ServingCompany=company.id)          # Получили список объектов
-            list_request = maintenance_request.objects.filter(Object=list_object,Status=status_id,DateTime_schedule__lte=datetime.date(now_date.year,cur_month,count_day_cur_month))
+            # Получили текущую дату
+            now_date = datetime.date.today()
+            # Получили текущий месяц
+            cur_month = now_date.month
+            # Получили количество дней в месяце
+            count_day_cur_month = calendar.mdays[datetime.date.today().month]
+            # Получили список объектов
+            list_object = mobjects.objects.filter(ServiceCompany=company.id)
+            list_request = mproposals.objects.\
+                filter(Object=list_object, Status=status_id,
+                       DateTime_schedule__lte=datetime.date(now_date.year, cur_month, count_day_cur_month))
 
             i = 0
             request_list = ''
-            for item in list_request:                                                   # Сформировали список объектов
-                i = i +1
+
+            # Сформировали список объектов
+            for item in list_request:
+                i = i+1
                 object_data = i.__str__()+'. '+item.Object.Client.Name.__str__()+' ('+item.Object.AddressObject.__str__()+'),<br/>'
                 if request_list == '':
                     request_list = object_data
@@ -104,7 +98,6 @@ def cron_sendmail_maintenance_request():         # Напоминает о не 
             message = text_template.render(Context({'object': mark_safe(request_list)}))
 
             recipient_email = recipient.EmailAddress
-            send_mail(subject,message, EMAIL_HOST_USER, [recipient_email])
+            send_mail(subject, message, EMAIL_HOST_USER, [recipient_email])
 
-#    send_mail(subject,message, EMAIL_HOST_USER, [recipient_list])
-#    return HttpResponseRedirect('/')
+    return redirect('dashboard:index')

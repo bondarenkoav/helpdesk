@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
-{% load staticfiles %}
-{% load bootstrap3 %}
-{% load short_fio %}
+{% load static %}
+{% load bootstrap4 %}
+{% load personal_tags %}
 
     {% block title %}Заявка на {{ filter }}{% endblock %}
 
@@ -45,7 +45,7 @@
                             <li>№ {{ act.id }} от {{ act.Day_reporting }}:
                                 Исполнители:
                                 {% for cowork in act.CoWorkers.all %}
-                                    {{ cowork.Person_FIO|short_fio }},
+                                    {{ cowork.Person_FIO }},
                                 {% endfor %}
                             </li>
                         {% endfor %}

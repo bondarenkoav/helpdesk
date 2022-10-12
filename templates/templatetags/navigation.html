@@ -1,0 +1,46 @@
+{% load mptt_tags %}
+
+<div class="navbar-custom">
+    <div class="container-fluid">
+        <div id="navigation">
+            <!-- Navigation Menu-->
+            <ul class="navigation-menu">
+                {% if nodes %}
+                    {% recursetree nodes %}
+                        {% if node.is_root_node %}                    <!-- если это корневой узел -->
+                            {% if not node.is_leaf_node %}            <!-- если это не элемент -->
+                                <li class="has-submenu">
+                                    <a href="#">
+                                        {% if node.icon %}
+                                            <i class="{{ node.icon }}"></i>
+                                        {% endif %} {{ node.name }}
+                                    </a>
+                                    <ul class="submenu">
+                                        {{ children }}
+                                    </ul>
+                                </li>
+                            {% else %}                                <!-- если это элемент -->
+                                <li>
+                                    <a href="/{{ node.slug }}/">{{ node.name }}</a>
+                                    {{ children }}
+                                </li>
+                            {% endif %}
+                        {% else %}                                    <!-- если это не корневой узел -->
+                            {% if node.is_leaf_node %}                <!-- если это элемент -->
+                                <li>
+                                    {% if node.slug != 'devider' %}
+                                        <a href="/{{ node.get_root.slug }}/{{ node.slug }}/">{{ node.name }}</a>
+                                        {{ children }}
+                                    {% else %}
+                                        <div class="dropdown-divider">{{ node.name }}</div>
+                                    {% endif %}
+                                </li>
+                            {% endif %}
+                        {% endif %}
+                    {% endrecursetree %}
+                {% endif %}
+            </ul>
+            <!-- End navigation menu -->
+        </div> <!-- end #navigation -->
+    </div> <!-- end container -->
+</div> <!-- end navbar-custom -->

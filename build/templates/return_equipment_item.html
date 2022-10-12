@@ -1,0 +1,66 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}Заявка на возврат оборудования{% endblock %}
+{% block section_active %}
+    {% if proposal_data %}
+        №{{ proposal_data.id }}
+    {% else %}
+        новая
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="position: relative; z-index: 1;">
+        <form action="{% url 'build:get_return_equipment_proposal' proposal_data.pk %}" method="post" class="form">
+            {% csrf_token %}
+            {% bootstrap_form_errors form %}
+            <div>
+                {% bootstrap_field form.ServiceCompany layout='horizontal' %}
+            </div>
+            <div>
+                {% bootstrap_field form.Client_words layout='horizontal' %}
+            </div>
+            <div>
+                {% bootstrap_field form.AddressObject layout='horizontal' %}
+            </div>
+            <div>
+                {% bootstrap_field form.FaultAppearance layout='horizontal' %}
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-3">
+                        {% bootstrap_label "Даты" label_for="DateTime_term" %}
+                    </div>
+                    <div class="col-9">
+                        <div class="row">
+                            <div class="col-12">
+                                {% bootstrap_field form.DateTime_term layout='horizontal' %}
+                            </div>
+                            <div class="col-12">
+                                {% bootstrap_field form.Date_work layout='horizontal' %}
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                {% bootstrap_field form.DescriptionWorks layout='horizontal' %}
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-3">
+                        {% bootstrap_label "Состояние" label_for="Status" %}
+                    </div>
+                    <div class="col-7">
+                        {% bootstrap_field form.Status layout='inline' %}
+                    </div>
+                    <div class="col-2">
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

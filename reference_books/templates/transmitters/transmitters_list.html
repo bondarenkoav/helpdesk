@@ -1,35 +1,26 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
+{% extends 'container.html' %}
+{% load paginator_tags %}
 
-{% block title %}Список исполнителей{% endblock %}
+{% block page_title %}Список передатчиков{% endblock %}
+{% block add_object_url %}{% url 'reference_books:addget_transmitter' %}{% endblock %}
+{% block add_object_name %}передатчик{% endblock %}
 
-    {% block title_body_h1 %}Список моделей передатчиков{% endblock %}
-    {% block title_body_small %}<a href="/reference_books/transmitters/item/">Добавить модель</a>{% endblock %}
+{% block table_head %}
+    <td style="width: 10%;">№ п/п</td>
+    <td style="width: 40%;">Модель передатчика</td>
+    <td style="width: 50%;">Наименование ПЦН</td>
+{% endblock %}
 
-    {% block content %}
-    <div class="container">
-        <div class="table-responsive">
-            <table class="table table-hover">
+{% block table_body %}
+    {% for item in list_transmitters %}
+        <tr id="obj_{{ item.id }}" onclick="location.href = '{% url 'reference_books:addget_transmitter' item.id %}';">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-right">{{ item.Name }}</td>
+            <td class="text-right">{{ item.SystemPCN }}</td>
+        </tr>
+    {% endfor %}
+{% endblock %}
 
-                <thead>
-                    <tr>
-                        <td style="width: 10%;">№ п/п</td>
-                        <td style="width: 40%;">Модель передатчика</td>
-                        <td style="width: 50%;">Наименование ПЦН</td>
-                    </tr>
-                </thead>
-
-                {% for item in list_transmitters %}
-                    <tbody>
-                        <tr id="obj_{{ item.id }}" onclick="location.href = '/reference_books/transmitters/item/{{ item.id }}/';">
-                            <td>{{ forloop.counter }}</td>
-                            <td>{{ item.Name }}</td>
-                            <td>{{ item.SystemPCN }}</td>
-                        </tr>
-                    </tbody>
-                {% endfor %}
-
-            </table>
-        </div>
-    </div>
-    {% endblock %}
+{% block pagination %}
+    {% rb_pagination list_transmitters 'reference_books' 'get_transmitters' %}
+{% endblock %}

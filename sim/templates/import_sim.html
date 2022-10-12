@@ -1,0 +1,22 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 %}
+
+{% block page_title %}Импорт данных о СИМ-картах{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <form action="{% url 'simmanage:import_sim' %}" method="post" class="form"  enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group mb-3">
+                <input type="file" accept=".xls,.xlsx" class="form-control" name="excel_file" id="inputGroupFile02" required="required">
+                <button class="btn btn-outline-secondary" type="submit" id="inputGroupFileAddon04">Отправить</button>
+            </div>
+        </form>
+        {% for row in excel_data %}
+            {% for cell in row %}
+                {{ cell }}&nbsp;&nbsp;
+            {% endfor %}
+            <br>
+        {% endfor %}
+    </div>
+{% endblock %}

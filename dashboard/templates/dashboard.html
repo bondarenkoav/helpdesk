@@ -1,0 +1,63 @@
+{% extends 'page.html' %}
+{% load dashboard_tags personal_tags static %}
+
+{% block include_header %}
+    {% if charts_data %}
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script type="text/javascript">
+            google.charts.load('current', {'packages':['corechart']});
+            google.charts.setOnLoadCallback(drawVisualization);
+            function drawVisualization() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Год', {% for item in list_month %}'{{ item.Month_name }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
+{#                    {% regroup charts_data by dyear as year_list %}#}
+                    {% for yitem in list_years %}
+                        ['{{ yitem.dyear|floatformat:"0" }}', {% for mitem in list_month %}{% get_completrequest_maintenace yitem.dyear mitem.Month_num %}{% if not forloop.last %}, {% endif %}{% endfor %}],
+                    {% endfor %}
+                ]);
+                var options = {
+                  title : 'Обслужено объектов ТО (демонстрация)',
+                  vAxis: {title: 'Количество'},
+                  hAxis: {title: 'Год'},
+                  seriesType: 'bars',
+                  series: { 12: {type: 'line'}}
+                };
+                var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                chart.draw(data, options);
+            }
+        </script>
+    {% endif %}
+{% endblock %}
+
+{% block page_title %}Панель управления{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-9">
+                <div class="row">
+                    <div class="col-6">
+                        {% informer_exploitation user %}
+                    </div>
+                    <div class="col-6">
+                        {% informer_build user %}
+                    </div>
+                    <div class="col-6">
+                        {% informer_maintenance user %}
+                    </div>
+                    <div class="col-6">
+                        {% informer_sim user %}
+                    </div>
+                    <div class="col-12">
+{#                        <div id="chart_div" style="width: 900px; height: 500px;"></div>#}
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                {% informer_birthdayboy %}
+                {% informer_usersactive %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,52 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="container" style="margin-bottom: 30px;">
+        <form action="{% url 'tasks:calc_disposer' calc_data.id %}" method="post">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+            <div class="row pt-lg-3">
+                <div class="col-3">ФИО контастного лица</div>
+                <div class="col-9">{{ calc_data.ContactPerson }}</div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Тип сигнализации</div>
+                <div class="col-9">
+                    {% for item in calc_data.TypeTask.all %}
+                        {% if forloop.counter != 1 %}, {% endif %}{{ item.Name }}
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Адрес объекта</div>
+                <div class="col-9">{{ calc_data.AddressObject }}</div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Наименование объекта</div>
+                <div class="col-9">{{ calc_data.NameObject }}</div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Номер телефона</div>
+                <div class="col-9">{{ calc_data.Phone }}</div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Адрес эл. почта</div>
+                <div class="col-9">{{ calc_data.Address_email }}</div>
+            </div>
+            <div class="row pt-lg-3">
+                <div class="col-3">Дополнительная информация</div>
+                <div class="col-9">{{ calc_data.Description }}</div>
+            </div>
+            <div class="pt-lg-3">
+                {% bootstrap_field form.executor layout='horizontal' %}
+            </div>
+            <div style="margin-top: 15px;" class="float-right">
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}

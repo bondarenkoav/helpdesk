@@ -1,0 +1,44 @@
+{% load static bootstrap4 personal_tags %}
+
+<div class="topbar-main" style="height: 60px;">
+    <div class="container-fluid">
+
+        <!-- Logo container-->
+        <div class="logo">
+            <!-- Image Logo -->
+            <a href="{% url 'exploitation:get_eproposals_engineer' %}" class="logo">
+                <img src="{% static "img/logo-sm.png" %}" alt="" height="22" class="logo-small">
+                <img src="{% static "img/logo.png" %}" alt="" height="24" class="logo-large">
+            </a>
+        </div>
+        <!-- End Logo container-->
+
+        <div class="menu-extras topbar-custom">
+            <ul class="list-inline float-right mb-0">
+                <!-- User-->
+                <li class="nav-item dropdown" style="margin-top: -10px;">
+                    <a class="nav-link dropdown-toggle arrow-none waves-effect nav-user" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-bars" aria-hidden="true"></i>
+                    </a>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item" href="#">
+                            Вы вошли как: {{ user|view_shortfio_user }}
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'profile' %}">
+                            <i class="fa fa-user-o" aria-hidden="true"></i> Профиль
+                        </a>
+                        <div class="dropdown-divider"></div>
+                        <a class="dropdown-item" href="{% url 'logout' %}">
+                            <i class="fa fa-sign-out" aria-hidden="true"></i> Выход
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!-- end menu-extras -->
+
+        <div class="clearfix"></div>
+
+    </div> <!-- end container -->
+</div>

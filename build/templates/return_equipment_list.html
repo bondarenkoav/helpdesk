@@ -1,0 +1,37 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags build_request_tags paginator_tags other_tags %}
+
+{% block page_title %}Возврат оборудования{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block table_head %}
+    <tr class="text-center">
+        <td style="width: 5%;">№</td>
+        <td style="width: 5%;">Добавлено</td>
+        <td style="width: 20%;">Контрагент</td>
+        <td style="width: 20%;">Адрес объекта</td>
+        <td style="width: 30%;">Описание</td>
+        <td style="width: 5%;">Срок</td>
+        <td style="width: 15%;">Статус</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in proposals %}
+        <tr class="table-{% get_return_equipment_color_string_in_list item.DateTime_term item.Status.slug %}"
+            id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'build:get_return_equipment_proposal' item.id %}');">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:i" }}</td>
+            <td class="text-center">{{ item.Client_words }}</td>
+            <td>{{ item.AddressObject }}</td>
+            <td>{{ item.FaultAppearance }}</td>
+            <td class="text-center">{{ item.DateTime_term|date:"d.m.Y" }}</td>
+            <td class="text-center">
+                {% if item.Status.slug != 'complete' %}
+                    {{ item.DateTime_schedule|date:"d.m.Y" }}
+                {% else %}
+                    {{ item.DateTime_work|date:"d.m.Y" }}
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}

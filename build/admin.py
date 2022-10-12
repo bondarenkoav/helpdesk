@@ -1,18 +1,20 @@
 from django.contrib import admin
+from build.models import bacts, bproposals
 
-# Register your models here.
-from build.models import acts_build, build_request, TypeRequest_build
 
 class ActsBuildInline(admin.StackedInline):
-    model = acts_build
+    model = bacts
     extra = 1
 
-class RequestBuildAdmin(admin.ModelAdmin):
-    list_display = ['Client','AddressObject','TypeRequest','Company','Status']
+
+class ProposalBuildAdmin(admin.ModelAdmin):
+    list_display = ['Client_choices', 'AddressObject', 'ServiceCompany', 'Status']
+    list_filter = ['ServiceCompany', 'Status']
     inlines = [ActsBuildInline]
 
-class TypeRequestBuildAdmin(admin.ModelAdmin):
-    list_display = ['Name','slug']
 
-admin.site.register(build_request, RequestBuildAdmin)
-admin.site.register(TypeRequest_build, TypeRequestBuildAdmin)
+class TypeBuildAdmin(admin.ModelAdmin):
+    list_display = ['Name', 'slug']
+
+
+admin.site.register(bproposals, ProposalBuildAdmin)

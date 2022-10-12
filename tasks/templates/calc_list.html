@@ -1,0 +1,40 @@
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags dashboard_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% comment %}{% block filters_form %}
+    {% bootstrap_form tasks_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False  %}
+{% endblock %}{% endcomment %}
+
+{% block table_head %}
+    <td style="width: 5%;">№</td>
+    <td style="width: 10%;">Дата/время добавления</td>
+    <td style="width: 40%;">Объект</td>
+    <td style="width: 20%;">Задача</td>
+    <td style="width: 10%;">Исполнитель</td>
+    <td style="width: 15%;">Стадия</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in list %}
+        <tr class="table-{{ item.Status.class_b4 }}" id="obj_{{ item.id }}"
+            onclick="location.href = '{% if item.executor.user == request.user %}{% url 'tasks:calc_executor' item.pk %}{% else %}{% url 'tasks:calc_other' item.pk %}{% endif %}';">
+            <th>{{ item.id }}</th>
+            <td>{{ item.DateTime_add }}</td>
+            <td class="text-center">{{ item.AddressObject }}</td>
+            <td class="text-center">
+                {% for type in item.TypeTask.all %}
+                    {{ type.Name }}{% if not forloop.last %}, {% endif %}
+                {% endfor %}
+            </td>
+            <td class="text-center">{{ item.executor }}</td>
+            <td class="text-center">{{ item.Status }} <br/></td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=tasks %}
+{% endblock %}

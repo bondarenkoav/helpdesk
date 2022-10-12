@@ -1,0 +1,58 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block include_header %}
+    <!-- DaData -->
+    <link rel="stylesheet" href="{% static "css/suggestions-15.12.css" %}">
+{% endblock %}
+
+{% block content %}
+    <div class="container" style="margin-bottom: 30px;">
+        <form action="{% url 'tasks:calc_operator' %}" method="post">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+            <div>
+                {% bootstrap_field form.ContactPerson layout='horizontal' %}
+            </div>
+            <div class="form-group row">
+                <div class="col-3">
+                    {% bootstrap_label "Тип сигнализации" label_for="TypeTask" %}
+                </div>
+                <div class="col-9">
+                    {% for choice in form.TypeTask %}
+                        <div class="form-check-inline" {% if forloop.counter0 == 0 %}style="margin-left: -.75rem;"{% endif %}>
+                            {% bootstrap_label choice %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div>
+                {% bootstrap_field form.AddressObject layout='horizontal' %}
+            </div>
+            <div class="pt-lg-0">
+                {% bootstrap_field form.NameObject layout='horizontal' %}
+            </div>
+            <div class="pt-lg-3">
+                {% bootstrap_field form.Phone layout='horizontal' %}
+            </div>
+            <div class="pt-lg-3">
+                {% bootstrap_field form.Address_email layout='horizontal' %}
+            </div>
+            <div class="pt-lg-3">
+                {% bootstrap_field form.Description layout='horizontal' %}
+            </div>
+            <div style="margin-top: 15px;" class="float-right">
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            </div>
+        </form>
+    </div>
+{% endblock %}
+
+{% block include_footer %}
+    <!-- DaData -->
+    <script src="{% static "js/jquery.suggestions-15.12.min.js" %}" type="text/javascript" ></script>
+    <script src="{% static "js/DaData.js" %}" type="text/javascript" ></script>
+{% endblock %}

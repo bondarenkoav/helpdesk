@@ -1,161 +1,154 @@
-import datetime
-from django.contrib.auth.decorators import login_required
-from django.core.paginator import Paginator
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
-from django.template.context_processors import csrf
-from build.forms import get_new_save_acts_build, coworkers_range_date, coworkers_object, coworker_range_date, get_new_save_request
-from build.models import acts_build, build_request
-from reference_books.models import ExpandedUserProfile, CoWorker, Status
+import logging
+from datetime import datetime, timedelta
+
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.models import Group, User
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
+from django.shortcuts import render, redirect
+from django.urls import reverse_lazy, reverse
+from django.views.decorators.csrf import csrf_protect
+
+from accounts.views import get_cur_scompany
+from build.apps import BuildAppConfig
+from build.forms import get_new_save_acts_build, get_new_save_request
+from build.models import bacts, bproposals, bproposals_filter
+from dashboard.views import logging_event
+from reference_books.models import Status, TypeRequest, TypeDocument, Event, TypeBuild
+from tasks.models import user_task
+
+logger = logging.getLogger(__name__)
+
+events = Event.objects.all()
+
+app = BuildAppConfig.name
+
+@login_required
+@permission_required('build.custom_view', login_url=reverse_lazy('page_error403'))
+def get_bproposals(request, status='open'):
+    qs = bproposals.objects.filter(
+        ServiceCompany=get_cur_scompany(request.user),
+        Status=Status.objects.get(slug=status)).order_by('-id')
+    proposals_filter = bproposals_filter(request.GET, queryset=qs)
+    paginator = Paginator(proposals_filter.qs, 20)
+    page = request.GET.get('page')
+    try:
+        proposals = paginator.page(page)
+    except PageNotAnInteger:
+        proposals = paginator.page(1)
+    except EmptyPage:
+        proposals = paginator.page(paginator.num_pages)
+    proposals_filter = bproposals_filter(request.GET, queryset=qs)
+
+    return render(request, 'bproposals_list.html', {
+        'title': 'Заявки на эксплуатацию',
+        'status': status,
+        'proposals': proposals,
+        'page': page,
+        'proposals_filter': proposals_filter
+    })
 
 
 @login_required
-def get_requests_build(request,status='open'):
-    args = {}
-    user_company = ExpandedUserProfile.objects.get(UserName=request.user.id).ServingCompany
-    args['status'] = status_query = Status.objects.get(slug=status)
-    if status=='complete':
-        args['requests'] = build_request.objects.filter(Company=user_company,Status=status_query.id,DateTime_add__year=datetime.datetime.today().year).order_by('-id')
-    else:
-        args['requests'] = build_request.objects.filter(Company=user_company,Status=status_query.id).order_by('-id')
+@permission_required('build.custom_view', login_url=reverse_lazy('page_error403'))
+@csrf_protect
+def addget_bproposals(request, proposal_id=None):
+    proposal_data = acts = olddata = []
+    tb_string = ''
+    if proposal_id:
+        proposal_data = bproposals.objects.get(id=proposal_id)
+        acts = bacts.objects.filter(proposal=proposal_id)
 
-    return render(request, 'request_build/request_list.html', args)
+    form = get_new_save_request(request.POST or None, user=request.user, instance=proposal_id and proposal_data)
 
-
-@login_required
-def addget_request_build(request, request_id=None):
-    args = {}
-    args.update(csrf(request))
-
-    form = get_new_save_request(request.POST or None, instance=request_id and build_request.objects.get(id=request_id))
-
-    if request.method == 'POST' and form.is_valid():
-        Company = ExpandedUserProfile.objects.get(UserName=request.user.id).ServingCompany
-        item = form.save(commit=False)
-        if request_id==None:
-            item.Create_user = request.user.id
-        else:
-            item.Update_user = request.user.id
-        item.Company = Company
-        item.save()
-        form.save_m2m()
-        return HttpResponseRedirect(reverse('build:get_requests',args=['open']))
-
-    else:
-        args['form'] = form
-        if request_id:
-            args['request_data'] = build_request.objects.get(id=request_id)
-            args['list_acts'] = acts_build.objects.filter(build_request=request_id)
-
-        return render(request, 'request_build/request_item.html', args)
-
-
-@login_required
-def get_acts_build(request,page_id=1):
-    list_acts = acts_build.objects.all()
-    current_page = Paginator(list_acts,20)
-    return render(request, 'acts/act_list.html', {'acts': current_page.page(page_id)})
-
-
-@login_required
-def addget_act_build(request, request_id=None, act_id=None):
-    args = {}
-    args.update(csrf(request))
-
-    form = get_new_save_acts_build(request.POST or None, user=request.user, instance=act_id and acts_build.objects.get(id=act_id))
-
-    if request.method == 'POST' and form.is_valid():
-        new_request = form.save(commit=False)
-        if act_id==None:
-            new_request.Create_user = request.user.id
-        else:
-            new_request.Update_user = request.user.id
-        new_request.build_request = build_request.objects.get(id=request_id)
-        new_request.save()
-        form.save_m2m()
-        return HttpResponseRedirect(reverse('build:add&get_request', args=[request_id]))
-
-    else:
-        args['form'] = form
-        if act_id:
-            args['act_data'] = acts_build.objects.get(id=act_id)
-        else:
-            args['request_data'] = build_request.objects.get(id=request_id)
-        return render(request, 'acts/act_item.html', args)
-
-
-@login_required
-def get_coworkers_range_date(request):
-    args = {}
-    args.update(csrf(request))
-
-    form = coworkers_range_date(request.POST)
-    user_company = ExpandedUserProfile.objects.get(UserName=request.user.id).ServingCompany
-
-    if request.method == 'POST' and form.is_valid():
-        acts_date_start = datetime.date(int(request.POST['acts_date_start_year']), int(request.POST['acts_date_start_month']), int(request.POST['acts_date_start_day']))
-        acts_date_stop  = datetime.date(int(request.POST['acts_date_stop_year']), int(request.POST['acts_date_stop_month']), int(request.POST['acts_date_stop_day']))
-
-        args['acts_date_start'] = acts_date_start
-        args['acts_date_stop'] = acts_date_stop
-
-        if acts_date_start != '' and acts_date_stop != '':
-            args['coworkers'] = CoWorker.objects.filter(ServingCompany=user_company).order_by('Person_FIO')
-            args['list_works'] = acts_build.objects.filter(Day_reporting__range=(acts_date_start, acts_date_stop))
-
-        args['form'] = coworkers_range_date
-
-        return render(request, 'employment_coworker.html', args)
-
-
-@login_required
-def get_coworker_range_date(request):
-    args = {}
-    args.update(csrf(request))
-
-    form = coworker_range_date(request.POST, user=request.user)
-
-    if request.method == 'POST' and form.is_valid():
-        coworker        = request.POST['CoWorkers']
-        no_range_date   = request.POST.get('no_range_date', False)
-        acts_date_start = datetime.date(int(request.POST['acts_date_start_year']), int(request.POST['acts_date_start_month']), int(request.POST['acts_date_start_day']))
-        acts_date_stop  = datetime.date(int(request.POST['acts_date_stop_year']), int(request.POST['acts_date_stop_month']), int(request.POST['acts_date_stop_day']))
-
-        args['acts_date_start'] = acts_date_start
-        args['acts_date_stop'] = acts_date_stop
-
-        if no_range_date != 'on' and coworker != '':
-            if acts_date_start != ''and acts_date_stop != '' and coworker != '':
-                args['acts'] = acts_build.objects.filter(CoWorkers=coworker,Day_reporting__range=(acts_date_start, acts_date_stop))
-                args['request'] = acts_build.objects.filter(CoWorkers=coworker,Day_reporting__range=(acts_date_start, acts_date_stop)).distinct(build_request)
+    if request.POST:
+        if form.is_valid():
+            new_request = form.save(commit=False)
+            if proposal_id is None:
+                new_request.TypeRequest = TypeRequest.objects.get(slug='build')
+                new_request.TypeDocument = TypeDocument.objects.get(slug='request')
             else:
-                args['acts_participation'] = acts_build.objects.filter(CoWorkers=coworker)#.order_by(support_request)
-                args['acts_edited'] = acts_build.objects.filter(CoWorkers=coworker)#.order_by(support_request)
-    else:
-        args['form'] = coworker_range_date
-        return render(request, 'coworker_range_date.html', args)
+                olddata = bproposals.objects.get(id=proposal_id)
+                new_request.ServiceCompany = olddata.ServiceCompany
+                new_request.TypeRequest = olddata.TypeRequest
+                new_request.TypeBuild = olddata.TypeBuild
+            new_request.save()
+            form.save_m2m()
+
+            if proposal_id is None:
+                try:
+                    logging_event(app, 'request', new_request.pk, events.get(slug='Request_add'), old_value='')
+                except:
+                    logger.error(u'|%s|: Ошибка добавления заявки на монтаж' % request.user.username)
+            else:
+                try:
+                    if new_request.TypeBuild != olddata.TypeBuild:
+                        for tb_item in olddata.TypeBuild.objects.all():
+                            if tb_string == '':
+                                tb_string = tb_item
+                            else:
+                                tb_string = tb_string + ', ' + tb_item
+                        logging_event(app, 'request', new_request.pk, events.get(slug='TypeSecurity_change'),
+                                      old_value=tb_string)
+                    if new_request.Client_choices != olddata.Client_choices:
+                        logging_event(app, 'request', new_request.pk, events.get(slug='Client_change'),
+                                      old_value=olddata.Client_choices.Name)
+                    if new_request.AddressObject != olddata.AddressObject:
+                        logging_event(app, 'request', new_request.pk, events.get(slug='AddressObj_change'),
+                                      old_value=olddata.AddressObject)
+                    if new_request.DateTime_schedule != olddata.DateTime_schedule:
+                        logging_event(app, 'request', new_request.pk, events.get(slug='DateSchedule_change'),
+                                      old_value=olddata.DateTime_schedule.__str__())
+                    if new_request.DateTime_work != olddata.DateTime_work:
+                        logging_event(app, 'request', new_request.pk, events.get(slug='DateWork_change'),
+                                      old_value=olddata.DateTime_work.__str__())
+                    if new_request.Status != olddata.Status:
+                        logging_event(app, 'request', new_request.pk, events.get(slug='Status_change'),
+                                      old_value=olddata.Status.Name)
+                except:
+                    logger.error(u'|%s|: Ошибка обновления заявки на монтаж' % request.user.username)
+
+            return redirect('close_tab')
+
+    return render(request, 'bproposals_item.html', {
+        'form': form,
+        'proposal_data': proposal_data,
+        'acts': acts
+    })
 
 
 @login_required
-def get_coworkers_object(request):
-    args = {}
-    args.update(csrf(request))
+def get_bacts(request, page_id=1):
+    list_acts = bacts.objects.all()
+    current_page = Paginator(list_acts,20)
+    return render(request, 'act_list.html', {'acts': current_page.page(page_id)})
 
-    form = coworkers_object(request.POST, user=request.user)
 
-    if request.method == 'POST' and form.is_valid():
-        num_request_build = request.POST['support_request']
+@login_required
+@csrf_protect
+def addget_bacts(request, proposal_id=None, act_id=None):
+    act_data = []
+    if act_id:
+        act_data = bacts.objects.get(id=act_id)
 
-        if num_request_build != '':
-            args['request']     = build_request.objects.get(id=num_request_build)
-            list_acts           = acts_build.objects.filter(support_request=num_request_build).order_by('Day_reporting')
-            args['list_acts']   = list_acts
-            args['build_day']   = list_acts.count()
-            args['build_start'] = list_acts.first()
-            args['build_stop']   = list_acts.last()
-            args['request_build'] = build_request.objects.get(id=num_request_build)
-    else:
-        args['form'] = coworkers_object
+    form = get_new_save_acts_build(request.POST or None, proposal_id=proposal_id, instance=act_id and bacts.objects.get(id=act_id))
 
-        return render(request, 'coworkers_object.html', args)
+    if request.POST:
+        if form.is_valid():
+            new_act = form.save(commit=False)
+            new_act.proposal = bproposals.objects.get(id=proposal_id)
+            new_act.save()
+            form.save_m2m()
+
+            if act_id is None:
+                try:
+                    logging_event(app, 'act', new_act.pk, events.get(slug='Act_add'), old_value='')
+                except:
+                    logger.error(u'|%s|: Ошибка добавления заявки на монтаж' % request.user.username)
+
+            return redirect('build:addget_bproposals', proposal_id=proposal_id)
+
+    return render(request, 'act_item.html', {
+        'form': form,
+        'act_data': act_data,
+        'proposal_data': bproposals.objects.get(id=proposal_id)
+    })

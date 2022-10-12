@@ -1,36 +1,41 @@
-{% extends 'base.html' %}
-{% load bootstrap3 reports_tags %}
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 reports_tags %}
 
-{% block title %}Заявка на {{ filter }}{% endblock %}
-{% block title_body_h1 %}Список исполнителей по объектам{% endblock %}
-{% block title_body_small %}с {{ acts_date_start }} по {{ acts_date_stop }}{% endblock %}
+{% block page_title %}
+    <form action="{% url 'reports:coworkers-range-date' %}" method="post" class="form">
+        {% csrf_token %}
+        <div class="form-group">
+            <div class="row">
+                <div class="col-2">
+                    {% bootstrap_field form.kind layout='inline' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_field form.acts_date_start layout='inline' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_field form.acts_date_stop layout='inline' %}
+                </div>
+                <div class="col-2">
+                    {% bootstrap_button "Показать" button_type="submit" button_class="btn-primary" %}
+                </div>
+                <div class="col-4">
+                    Список исполнителей <small class="text-muted">по объектам</small>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock %}
 
 {% block content %}
     <div class="container">
-        <div class="panel panel-default noprint" style="max-width: 800px;">
-            <div class="panel-body">
-                <form action="{% url 'reports:report_coworkers_range_date' %}" method="post" class="form">
-                    {% csrf_token %}
-                    <div class="row">
-                        <div class="col-xs-10">
-                            {% bootstrap_form form layout='horizontal' %}
-                        </div>
-                        <div class="col-xs-2">
-                            {% buttons %}
-                                <button type="submit" class="btn btn-primary text-center" style="margin-top: 10px;">
-                                    Вывести
-                                </button>
-                            {% endbuttons %}
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-        <hr/>
-        <div>
+        {% if kind == 'by_cowork' %}
             {% for coworker in coworkers %}
-                {% get_employment_coworker coworker=coworker date_start=date_start date_end=date_end %}
+                {% get_employment_coworker coworker=coworker date_start=date_start date_end=date_end scompany=scompany %}
             {% endfor %}
-        </div>
+        {% else %}
+            {% for date in dates %}
+                {% get_employment_dates date=date scompany=scompany %}
+            {% endfor %}
+        {% endif %}
     </div>
 {% endblock %}

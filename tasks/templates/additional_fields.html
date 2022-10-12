@@ -1,0 +1,124 @@
+{% extends 'page.html' %}
+{% load static bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block include_header %}
+    <script>
+        function CalcNewTotalSumm() {
+            var new_sale = parseInt(document.getElementById("id_sale").value);
+            if (new_sale > 25 || new_sale < 0) {
+                alert('Размер скидки на работы:  0 - 25%');
+            }
+            else {
+                var curr_materials = parseFloat(document.getElementById("id_curr_materials").value);
+                var curr_works = parseFloat(document.getElementById("id_curr_works").value);
+                var total_worx = curr_works - ((new_sale/100)*curr_works);
+                var curr_commissioning = parseFloat(document.getElementById("id_curr_commissioning").value);
+                var curr_project = parseFloat(document.getElementById("id_curr_project").value);
+                var total_summ = 0;
+                total_summ = curr_materials + total_worx + curr_commissioning + curr_project;
+                document.getElementById("new_total").innerHTML = 'Новая итоговая сумма: ' + total_summ + ' Руб. Не забудьте сохранить результат!';
+            }
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="wrapper-page mt-0" style="max-width: 1000px;">
+        {% bootstrap_form_errors form %}
+        <form action="{% url 'tasks:addget_params' calc_data.id %}" method="post" class="form">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-5">
+                    {% bootstrap_label "Пусконаладочные работы" label_for="commissioning" %}
+                </div>
+                <div class="col-5">
+                    {% bootstrap_field form.commissioning layout='inline' %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5">
+                    {% bootstrap_label "Проектные работы" label_for="projects" %}
+                </div>
+                <div class="col-5">
+                    {% bootstrap_field form.projects layout='inline' %}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-5">
+                    {% bootstrap_label "Снижение стоимости работ, %" label_for="sale" %}
+                </div>
+                <div class="col-5">
+                    {% bootstrap_field form.Sale layout='inline' %}
+                </div>
+            </div>
+            <div><hr/></div>
+            <div class="row">
+                <div class="col-3">
+                    Итого материалы:
+                </div>
+                <div class="col-5">
+                    <input id="id_curr_materials" value="{{ total_materials }}" type="hidden">
+                    <strong>{{ total_materials }}</strong> Руб.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Итого работы:
+                </div>
+                <div class="col-7">
+                    <input id="id_curr_works" value="{{ total_works }}" type="hidden">
+                    {% if total_sale > 0 %}{{ total_works }} - {{ total_sale }} ={% endif %}
+                    <strong>{% if total_sale > 0 %}{{ total_worksale }}{% else %}{{ total_works }}{% endif %}</strong> Руб.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Пусконаладочные работы:
+                </div>
+                <div class="col-5">
+                    <input id="id_curr_commissioning" value="{{ total_commissioning }}" type="hidden">
+                    <strong>{{ total_commissioning }}</strong> Руб.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    Проектные работы:
+                </div>
+                <div class="col-5">
+                    <input id="id_curr_project" value="{{ total_project }}" type="hidden">
+                    <strong>{{ total_project }}</strong> Руб.
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-3">
+                    <strong>Итоговая сумма:</strong>
+                </div>
+                <div class="col-3">
+                    {% if total_summ %}
+                        <input id="id_currtotalsumm" value="{{ total_summ }}" type="hidden">
+                        <strong>{{ total_summ }}</strong> Руб.
+                    {% endif %}
+                </div>
+                <div class="col-5">
+                    <small class="text-muted"><span id="new_total"></span></small>
+                </div>
+            </div>
+            <div><hr/></div>
+            <div class="row">
+                <div class="col-6 float-left">
+                    <a class="btn btn-warning mr-2" href="{% url 'tasks:addget_materials' calc_data.id %}" role="button">Вернуться</a>
+                </div>
+                <div class="col-6 float-right">
+                    {% buttons %}
+                        {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary mr-2" %}
+                        <a class="btn btn-success mr-2" href="{% url 'tasks:print_calculations' calc_data.id %}" role="button" target="_blank">Печать</a>
+                        <a class="btn btn-warning" href="{% url 'tasks:calc_executor' calc_data.id %}" role="button">Закрыть</a>
+                    {% endbuttons %}
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

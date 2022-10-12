@@ -1,0 +1,18 @@
+{% load personal_tags static mathfilters %}
+
+{% if birthdayboy %}
+    <div class="mini-stat clearfix bg-white">
+        <div><h4>Именинники</h4></div>
+        {% for person in birthdayboy %}
+            <div class="media">
+                <img src="{% if forloop.counter == 1 %}{% static image_url %}{% else %}#{% endif %}" class="mr-3" style="width: 60px; margin-top: 10px;" alt="">
+                <div class="media-body">
+                    <h5 class="mt-0">
+                        Поздравляем {% get_jubilee person.birthday.year as jubilee %}{% if jubilee %}юбиляра{% else %}именинника{% endif %}
+                    </h5>
+                    <p>Пожелаем Вам <strong>{{ person.user.last_name }} {{ person.user.first_name }}</strong>, крепкого здоровья и творческих успехов!!!</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}

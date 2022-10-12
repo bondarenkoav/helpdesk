@@ -1,0 +1,159 @@
+{% extends 'page.html' %}
+{% load bootstrap4 personal_tags %}
+
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{{ title_small }}{% endblock %}
+
+{% block content %}
+    <div class="container" style="margin-bottom: 30px;">
+        <form action="{% if task_data %}{% url 'tasks:addget_task' task_data.id %}{% else %}{% url 'tasks:addget_task' %}{% endif %}" method="post" enctype="multipart/form-data">
+            {% bootstrap_form_errors form %}
+            {% csrf_token %}
+            {% if task_data %}
+                <div class="form-group">
+                    Автор задачи: {{ task_data.author|view_shortfio_user }}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Заголовок" label_for="title" %}
+                    </div>
+                    <div class="col-4">
+                        {% bootstrap_field form.title layout='inline' error_css_class='invalid-feedback' %}
+                    </div>
+                    <div class="col-3">
+                        {% bootstrap_field form.high_importance layout='horizontal' error_css_class='invalid-feedback' %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Контрагент" label_for="title" %}
+                    </div>
+                    <div class="col-10">
+                        {% bootstrap_field form.client layout='inline' error_css_class='invalid-feedback' %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Срок исполнения" label_for="Date_limit" %}
+                    </div>
+                    <div class="col-2">
+                        {% if task_data %}
+                            {% if request.user != task_data.author %}
+                                {{ task_data.Date_limit }}
+                            {% else %}
+                                {% bootstrap_field form.Date_limit layout='inline' error_css_class='invalid-feedback' %}
+                            {% endif %}
+                        {% else %}
+                            {% bootstrap_field form.Date_limit layout='inline' error_css_class='invalid-feedback' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Описание задачи" label_for="description" %}
+                    </div>
+                    <div class="col-10">
+                        {% if task_data %}
+                            {% if request.user != task_data.author %}
+                                {{ task_data.description|safe }}
+                            {% else %}
+                                {% bootstrap_field form.description layout='inline' error_css_class='invalid-feedback' %}
+                            {% endif %}
+                        {% else %}
+                            {% bootstrap_field form.description layout='inline' error_css_class='invalid-feedback' %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Исполнитель" label_for="executor" %}
+                    </div>
+                    <div class="col-10">
+                        <div class="row">
+                            <div class="col-4">
+                                {% bootstrap_field form.executor layout='inline' error_css_class='invalid-feedback' %}
+                            </div>
+                            <div class="col-3">{% bootstrap_label "Группа исполнителей" label_for="group_executor" %}</div>
+                            <div class="col-5">
+                                {% bootstrap_field form.group_executor layout='inline' error_css_class='invalid-feedback' %}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Статус выполнения" label_for="status" %}
+                    </div>
+                    <div class="col-10">
+                        {% bootstrap_field form.status layout='inline' error_css_class='invalid-feedback' %}
+                    </div>
+
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Уведомить автора" label_for="notification" %}
+                    </div>
+                    <div class="col-10">
+                        {% bootstrap_field form.notification layout='inline' error_css_class='invalid-feedback' %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Описание выполнения" label_for="work_desc" %}
+                    </div>
+                    <div class="col-10">
+                        {% bootstrap_field form.work_desc layout='inline' error_css_class='invalid-feedback' %}
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-2">
+                        {% bootstrap_label "Файл" label_for="file" %}
+                    </div>
+                    <div class="col-6">
+                        {% if task_data %}
+                            {% if task_data.author == request.user and task_data.status.slug != 'complete' %}
+                                {% bootstrap_field form.file layout='inline' error_css_class='invalid-feedback' %}
+                            {% else %}
+                                Замена/удаление файла невозможно!
+                            {% endif %}
+                        {% else %}
+                            {% bootstrap_field form.file layout='inline' error_css_class='invalid-feedback' %}
+                        {% endif %}
+                    </div>
+                    <div class="col-4">
+                        {% if task_data %}
+                            {% if task_data.file %}
+                                <a href="{% url 'tasks:get_file' task_data.id %}" target="_blank">
+                                    <i class="fa fa-paperclip fa-lg" aria-hidden="true"></i> Открыть вложение
+                                </a>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% buttons class="text-right" %}
+                <a class="btn btn-warning" href="{% url 'tasks:getlist_tasks' %}" role="button">Вернуться к списку</a>
+                {% bootstrap_button "Сохранить" button_type="submit" button_class="btn-primary" %}
+            {% endbuttons %}
+        </form>
+    </div>
+{% endblock %}

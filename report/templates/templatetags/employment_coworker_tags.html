@@ -1,6 +1,6 @@
-{% load short_fio %}
+{% load personal_tags %}
 
-{% if list_build or list_trouble or list_maintenance %}
+{% if list_build or list_exploitation or list_maintenance %}
     <div class="panel panel-default">
         <!-- Default panel contents -->
         <div class="panel-heading">{{ coworker.Person_FIO }}</div>
@@ -10,7 +10,8 @@
             <thead>
                 <tr class="text-center">
                     <td style="width: 20%;">Дата</td>
-                    <td style="width: 40%;">Объект</td>
+                    <td style="width: 90%;">Объект</td>
+                    <td style="width: 10%;"></td>
                 </tr>
             </thead>
             <tbody>
@@ -24,7 +25,7 @@
                     {% for item_build in list_build %}
                         <tr>
                             <td class="text-center">{{ item_build.Day_reporting }}</td>
-                            <td class="text-center">{{ item_build.build_request.Client.Name }} ({{ item_build.build_request.AddressObject }})</td>
+                            <td class="text-center">{{ item_build.proposal.Client.Name }} ({{ item_build.proposal.AddressObject }})</td>
                         </tr>
                     {% endfor %}
                     <tr>
@@ -45,27 +46,34 @@
                         <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_maintenance|length }} объекта(ов)</td>
                     </tr>
                 {% endif %}
-                {% if list_trouble %}
+                {% if list_exploitation %}
                     <tr>
                         <td colspan="2">
-                            <strong>Устранение неисправностей</strong>
+                            <strong>Эксплуатация</strong>
+                        </td>
+                        <td>
+                            <a target="_blank" href="{% url 'exploitation:export_toexcel_eproposals' coworker.id date_start|date:"dmY" date_end|date:"dmY" %}">
+                                <i class="fa fa-arrow-right" aria-hidden="true">
+                                    <i class="fa fa-file-excel-o fa-2x" aria-hidden="true"></i>
+                                </i>
+                            </a>
                         </td>
                     </tr>
-                    {% for item_trouble in list_trouble %}
+                    {% for item_exploitation in list_exploitation %}
                         <tr>
-                            <td class="text-center">{{ item_trouble.DateTime_work}}</td>
+                            <td class="text-center">{{ item_exploitation.DateTime_work}}</td>
                             <td class="text-center">
-                                {% if item_trouble.Client_bd != None %}
-                                    {{ item_trouble.Client_bd }}
+                                {% if item_exploitation.Client_bd != None %}
+                                    {{ item_exploitation.Client_bd }}
                                 {% else %}
-                                    {{ item_trouble.Client }}
+                                    {{ item_exploitation.Client }}
                                 {% endif %}
-                                ({{ item_trouble.NumObject }} - {{ item_trouble.AddressObject }})
+                                ({{ item_exploitation.NumObject }} - {{ item_exploitation.AddressObject }})
                             </td>
                         </tr>
                     {% endfor %}
                     <tr>
-                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_trouble|length }} объекта(ов)</td>
+                        <td class="text-right" colspan="2"><strong>Итого:</strong> {{ list_exploitation|length }} объекта(ов)</td>
                     </tr>
                 {% endif %}
             </tbody>

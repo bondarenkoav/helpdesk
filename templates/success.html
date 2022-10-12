@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="accountbg"></div>
+        <div class="wrapper-page">
+            <div class="card">
+                <div class="card-block">
+                    <div class="alert alert-success" role="alert">
+                        <h4 class="alert-heading">{{ message_type }}</h4>
+                        <p>{{ message_description }}</p>
+                        <hr/>
+                        <p>{{ message_ps }}</p>
+                        <a class="btn btn-info mb-5 waves-effect waves-light" href="{% url 'login' %}">Вернутся в Панель управления</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+{% endblock %}

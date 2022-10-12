@@ -1,50 +1,66 @@
-{% extends 'base.html' %}
-{% load staticfiles %}
-{% load short_fio %}
-{% load get_user_publics %}
+{% extends 'container_fluid.html' %}
+{% load bootstrap4 personal_tags paginator_tags %}
 
-{% block title %}Список симкарт{% endblock %}
-{% block title_body_h1 %}SIM-карты{% endblock %}
-{% block title_body_small %}
-    {% if status == 'active' %}
-        активные
-    {% else %}
-        не активные
-    {% endif %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block section_active %}{% endblock %}
+
+{% block filters_form %}
+    {% bootstrap_form opsoscard_filter.form layout='horizontal' horizontal_label_class='col-md-4' horizontal_field_class='col-md-8' show_help=False  %}
 {% endblock %}
 
-{% block content %}
-    <div class="table-responsive divsortTable">
-        <table class="table" id="sortTable">
-            <thead>
-                <tr class="text-center">
-                    <td style="width: 10%;">№ SIM-карты</td>
-                    <td style="width: 10%;">Оператор</td>
-                    <td style="width: 10%;">Тариф</td>
-                    <td style="width: 10%;">Абонентская плата</td>
-                    <td style="width: 20%;">ПЦН</td>
-                    <td style="width: 40%;">Применяется</td>
-                </tr>
-            </thead>
-            <tbody>
-                {% for item in simcards %}
-                    <tr id="obj_{{ item.id }}"  onclick="location.href = '{% url 'simmanage:add&get_simcard' item.id %}';">
-                        <td class="text-center">{{ item.Number_SIM }}</td>
-                        <td class="text-center">{{ item.OpSoSRate.OpSoSName }}</td>
-                        <td class="text-center">{{ item.OpSoSRate.Rate }}</td>
-                        <td class="text-center">{{ item.OpSoSRate.price }} руб.</td>
-                        <td class="text-center">{{ item.Owner }}</td>
-                        <td class="text-left">
-                            {{ item.Use_type }}
-                            {% if item.Use_type.slug == 'usesim_object' %}
-                                Объект: №{{ item.Use_numberobject }} {{ item.Use_nameobject }} ({{ item.Use_addressobject }})
-                            {% else %}
-                                ФИО: {{ item.Use_user }}
-                            {% endif %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+{% block add_object_url %}{% url 'simmanage:addget_simcard' %}{% endblock %}
+{% block add_object_name %}заявку{% endblock %}
+
+{% block table_head %}
+    <td style="width: 5%;">#</td>
+    <td style="width: 10%;">№ SIM-карты</td>
+    <td style="width: 10%;">Оператор</td>
+    <td style="width: 15%;">Тариф</td>
+    <td style="width: 10%;">Абонентская плата</td>
+    <td style="width: 10%;">Тип</td>
+    <td style="width: 25%;">Применяется</td>
+    <td style="width: 10%;">Автор</td>
+    <td style="width: 5%;">СК</td>
+{% endblock %}
+
+{% block table_body %}
+    {% for item in opsoscard %}
+        <tr class="table-{% if item.Status is True %}success{% else %}secondary{% endif %}" id="obj_{{ item.id }}" target="_blank" onclick="javascript:window.open('{% url 'simmanage:addget_simcard' item.id %}')">
+            <td class="text-center">{{ item.id }}</td>
+            <td class="text-center">{{ item.Number_SIM }}</td>
+            <td class="text-center">{{ item.OpSoSRate.OpSoSName }}</td>
+            <td class="text-center">{{ item.OpSoSRate.Rate }}</td>
+            <td class="text-center">{{ item.OpSoSRate.price }} руб.</td>
+            <td class="text-center">
+                {% if item.Use_type == 'usesim_user' %}
+                    Корпоративная
+                {% else %}
+                    Объектовая
+                {% endif %}
+            </td>
+            <td class="text-right">
+                {% if item.Use_type == 'usesim_object' %}
+                    Объект: №{{ item.Use_numberobject }} {{ item.Use_nameobject }} ({{ item.Use_addressobject }})
+                {% else %}
+                    ФИО: {{ item.Use_user }}
+                {% endif %}
+            </td>
+            <td class="text-center">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <small> {{ item.Create_user|view_shortfio_user }}</small>
+                {% if item.Update_user %}
+                    <br/>
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                    <small> {{ item.Update_user|view_shortfio_user }}</small>
+                {% endif %}
+            </td>
+            <td class="text-center">
+                <small>{{ item.ServiceCompany }}</small>
+            </td>
+        </tr>
+    {% endfor %}
+{% endblock %}
+
+{% block pagination %}
+    {% include 'templatetags/pagination.html' with page_obj=opsoscard %}
 {% endblock %}

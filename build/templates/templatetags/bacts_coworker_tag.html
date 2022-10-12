@@ -1,0 +1,5 @@
+{% load personal_tags %}
+
+{% for cowork in acts.CoWorkers.all %}
+    {{ cowork.id|view_shortfio_coworker }},<br/>
+{% endfor %}
