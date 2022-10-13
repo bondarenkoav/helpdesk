@@ -1,8 +1,7 @@
 import requests
 
 # telegram url
-url = "https://api.telegram.org/bot1730861248:AAH4B5r3YKhzONijjLKEyy8zIJleuO3Nk7s"
-# 1730861248:AAH4B5r3YKhzONijjLKEyy8zIJleuO3Nk7s
+url = ""
 
 
 def send_mess(text):
