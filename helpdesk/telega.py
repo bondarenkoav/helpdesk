@@ -5,7 +5,7 @@ url = ""
 
 
 def send_mess(text):
-    params = {'chat_id': -1001422493774, 'text': text}
+    params = {'chat_id': ***********, 'text': text}
     response = requests.post(url + '/sendMessage', data=params)
     return response
 
