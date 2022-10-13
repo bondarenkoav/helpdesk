@@ -1,7 +1,7 @@
 import requests
 
 # telegram url
-url = ""
+url = "************************"
 
 
 def send_mess(text):
