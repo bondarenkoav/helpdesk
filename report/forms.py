@@ -48,6 +48,7 @@ KIND_CHOICES = (
     ('by_cowork', u'по исполнителю'),
 )
 
+
 class coworkers_range_date(forms.Form):          # Вывести: кто где работал в течении заданного периода и за один день
     kind = forms.ChoiceField(required=True, label="Статус", choices=KIND_CHOICES,
                              widget=forms.Select(attrs={'class':'selector'}))

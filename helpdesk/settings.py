@@ -48,9 +48,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'ckeditor', 'ckeditor_uploader', 'online_users', 'magic', 'bootstrap4', 'mptt', 'django_filters', 'autoslug',
-    'mathfilters', 'django_currentuser',
+    'mathfilters', 'django_currentuser', 'rest_framework', 'rest_framework.authtoken', 'djoser',
 
     'accounts', 'dashboard', 'reference_books', 'exploitation', 'build', 'report', 'sim', 'maintenance', 'tasks',
+    'newsblog', 'api',
 ]
 
 MIDDLEWARE = [
@@ -90,6 +91,14 @@ WSGI_APPLICATION = 'helpdesk.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
+    'default': {
+       'ENGINE': 'django.db.backends.postgresql_psycopg2',
+       'NAME': 'helpdesk',
+       'USER': 'request',
+       'PASSWORD': '123456',
+       'HOST': '192.168.41.241',
+       'PORT': '5432',
+    },
 }
 
 
@@ -126,7 +135,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), 'P:\djangoprojects\helpdesk\static',)
+STATICFILES_DIRS = (os.path.join(BASE_DIR, "static"), 'S:\djangoprojects\helpdesk\static',)
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -140,10 +149,10 @@ CRONJOBS = [
 
 
 # amulet-secur.ru
-EMAIL_HOST = ''
+EMAIL_HOST = 'smtp.yandex.ru'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = ""
-EMAIL_HOST_PASSWORD = ""
+EMAIL_HOST_USER = "amulet-orsk@yandex.ru"
+EMAIL_HOST_PASSWORD = "F,hfv0d"
 EMAIL_USE_SSL = True
 #EMAIL_USE_TLS = False
 
@@ -274,3 +283,28 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'Basic',
     },
 }
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 15,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
+NAME_APP = 'Zayavki'
+NAME_COMPANY = 'Amulet'
+DEVELOP_NAME = 'bondarenko'
+DEVELOP_EMAIL = 'printex.orsk@gmail.com'
+OWNER = 'Amulet'

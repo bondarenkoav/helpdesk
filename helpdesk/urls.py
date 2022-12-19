@@ -1,6 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from django.views.generic import RedirectView
 from django.contrib.auth import logout
 from dashboard.views import close_tab, journal_events
@@ -42,6 +42,12 @@ urlpatterns = [
 
     url(r'^reference_books/', include('reference_books.urls', namespace='reference_books')),
     url(r'^reports/', include('report.urls', namespace='reports')),
+
+    # DRF
+    path('api/', include('api.urls', namespace='api')),
+    path('api/drf-auth/', include('rest_framework.urls')),
+    # path('api/auth/', include('djoser.urls')),
+    # re_path(r'^auth/', include('djoser.urls.authtoken')),
 
     url(r'^', include('dashboard.urls', namespace='dashboard')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
