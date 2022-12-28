@@ -73,7 +73,8 @@
                         </div>
                     </div>
                 </div>
-                {% bootstrap_messages %}
+                {% bootstrap_form_errors form %}
+                {% bootstrap_messages form %}
             </form>
         </div>
     </div>
@@ -83,101 +84,95 @@
         </div>
     {% endif %}
     {% if requests.count > 0 or objects.count > 0 %}
-        <div>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead class="thead-dark">
-                        <tr class="text-center">
-                            <td style="width: 5%;">Тип</td>
-                            <td style="width: 7%;">Добавлено</td>
-                            <td style="width: 5%;">Запланировано</td>
-                            <td style="width: 20%;">Объект</td>
-                            <td style="width: 15%;">Контрагент</td>
-                            <td style="width: 23%;">Вид неисправности</td>
-                            <td style="width: 10%;">Описание устранения</td>
-                            <td style="width: 5%;">Статус</td>
-                            <td style="width: 10%;">Исполнитель</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in requests %}
-                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('{% if type == 'exploitation' %}{% url 'exploitation:addget_eproposals' item.id %}{% elif type == 'build' %}{% url 'build:addget_bproposals' item.id %}{% else %}{% url 'maintenance:addget_mproposals' item.id %}{% endif %}')";>
-                                <td class="text-center" style="margin-top: -10px;">
-                                    <abbr class="h4 d-print-none" title="{{ item.TypeRequest.Name }}"><small>{{ item.TypeRequest.short_name }}</small></abbr>
-                                    <abbr class="h4 d-print-none" title="{{ item.TypeDocument.Name }}"><small>{{ item.TypeDocument.short_name }}</small></abbr>
-                                    <small class="d-none d-print-block">{{ item.TypeRequest.short_name }}{{ item.TypeDocument.short_name }}</small>
-                                    <small>/{{ item.id }}</small>
-                                </td>
-                                <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:i"  }}</td>
-                                <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
-                                <td class="text-right">
-                                    {% if type == 'exploitation' %}
-                                        {{ item.NumObject }} ({{ item.AddressObject }})
-                                    {% elif type == 'build' %}
-                                        {{ item.AddressObject }}
-                                    {% else %}
-                                        {{ item.Object.AddressObject }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-right">
-                                    {% if type == 'exploitation' %}
-                                        {{ item.Client_words }}
-                                    {% elif type == 'build' %}
-                                        {{ item.Client }}
-                                    {% else %}
-                                        {{ item.Object.Client_choices }}
-                                    {% endif %}
-                                </td>
-                                <td class="text-center">{{ item.FaultAppearance }}</td>
-                                <td>{{ item.DescriptionWorks }}</td>
-                                <td class="text-center">{{ item.Status }}<br/>{{ item.DateTime_work|date:"d.m.Y" }}</td>
-                                <td class="text-center">
-                                    {% if type == 'build' %}
-                                        {% get_coworker_from_acts item.id %}
-                                    {% else %}
-                                        {% for cowork in item.CoWorkers.all %}
-                                            {{ cowork.id|view_shortfio_coworker }},<br/>
-                                        {% endfor %}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                        {% for item in objects %}
-                            <tr id="obj_{{ item.id }}" target="_self" onclick="javascript:window.open('{% url 'maintenance:addget_mobjects' item.id %}')";>
-                                <td class="text-center">
-                                    <abbr class="h4" title="{{ item.TypeRequest.Name }}">{{ item.TypeRequest.short_name }}</abbr>
-                                    <abbr class="h4" title="{{ item.TypeDocument.Name }}">{{ item.TypeDocument.short_name }}</abbr>
-                                </td>
-                                <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m"  }}</td>
-                                <td class="text-center"></td>
-                                <td class="text-right">{{ item.AddressObject }}</td>
-                                <td class="text-right">{{ item.Client_choices }}
-                                </td>
-                                <td class="text-center"></td>
-                                <td></td>
-                                <td class="text-center">
-                                    {% if item.Status_object == True %}Обслуживается{% else %}Не обслуживается{% endif %}
-                                </td>
-                                <td class="text-center">
-                                    <i class="fa fa-plus" aria-hidden="true"></i>
-                                    <small> {{ item.Create_user|view_shortfio_user }}</small>
-                                    {% if item.Update_user %}
-                                        <br/>
-                                        <i class="fa fa-pencil" aria-hidden="true"></i>
-                                        <small> {{ item.Update_user|view_shortfio_user }}</small>
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        {% endfor %}
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {% else %}
-        <div class="container alert alert-warning" role="alert">
-            Нет результатов поиска. Попробуйте изменить параметры поиска!
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead class="thead-dark">
+                <tr class="text-center">
+                    <td style="width: 5%;">Тип</td>
+                    <td style="width: 7%;">Добавлено</td>
+                    <td style="width: 5%;">Запланировано</td>
+                    <td style="width: 20%;">Объект</td>
+                    <td style="width: 15%;">Контрагент</td>
+                    <td style="width: 23%;">Вид неисправности</td>
+                    <td style="width: 10%;">Описание устранения</td>
+                    <td style="width: 5%;">Статус</td>
+                    <td style="width: 10%;">Исполнитель</td>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in requests %}
+                    <tr id="obj_{{ item.id }}" target="_self"
+                        onclick="javascript:window.open('{% if type == 'exploitation' %}{% url 'exploitation:addget_eproposals' item.id %}{% elif type == 'build' %}{% url 'build:addget_bproposals' item.id %}{% else %}{% url 'maintenance:addget_mproposals' item.id %}{% endif %}')";>
+                        <td class="text-center" style="margin-top: -10px;">
+                            <abbr class="h4 d-print-none" title="{{ item.TypeRequest.Name }}"><small>{{ item.TypeRequest.short_name }}</small></abbr>
+                            <abbr class="h4 d-print-none" title="{{ item.TypeDocument.Name }}"><small>{{ item.TypeDocument.short_name }}</small></abbr>
+                            <small class="d-none d-print-block">{{ item.TypeRequest.short_name }}{{ item.TypeDocument.short_name }}</small>
+                            <small>/{{ item.id }}</small>
+                        </td>
+                        <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:i"  }}</td>
+                        <td class="text-center">{{ item.DateTime_schedule|date:"d.m.Y" }}</td>
+                        <td class="text-right">
+                            {% if type == 'exploitation' %}
+                                {{ item.NumObject }} ({{ item.AddressObject }})
+                            {% elif type == 'build' %}
+                                {{ item.AddressObject }}
+                            {% else %}
+                                {{ item.Object.AddressObject }}
+                            {% endif %}
+                        </td>
+                        <td class="text-right">
+                            {% if type == 'exploitation' %}
+                                {{ item.Client_words }}
+                            {% elif type == 'build' %}
+                                {{ item.Client }}
+                            {% else %}
+                                {{ item.Object.Client_choices }}
+                            {% endif %}
+                        </td>
+                        <td class="text-center">{{ item.FaultAppearance }}</td>
+                        <td>{{ item.DescriptionWorks }}</td>
+                        <td class="text-center">{{ item.Status }}<br/>{{ item.DateTime_work|date:"d.m.Y" }}</td>
+                        <td class="text-center">
+                            {% if type == 'build' %}
+                                {% get_coworker_from_acts item.id %}
+                            {% else %}
+                                {% for cowork in item.CoWorkers.all %}
+                                    {{ cowork.id|view_shortfio_coworker }},<br/>
+                                {% endfor %}
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                {% for item in objects %}
+                    <tr id="obj_{{ item.id }}" target="_self"
+                        onclick="javascript:window.open('{% url 'maintenance:addget_mobjects' item.id %}')";>
+                        <td class="text-center">
+                            <abbr class="h4" title="{{ item.TypeRequest.Name }}">{{ item.TypeRequest.short_name }}</abbr>
+                            <abbr class="h4" title="{{ item.TypeDocument.Name }}">{{ item.TypeDocument.short_name }}</abbr>
+                        </td>
+                        <td class="text-center">{{ item.DateTime_add|date:"d.m.Y H:m"  }}</td>
+                        <td class="text-center"></td>
+                        <td class="text-right">{{ item.AddressObject }}</td>
+                        <td class="text-right">{{ item.Client_choices }}
+                        </td>
+                        <td class="text-center"></td>
+                        <td></td>
+                        <td class="text-center">
+                            {% if item.Status_object == True %}Обслуживается{% else %}Не обслуживается{% endif %}
+                        </td>
+                        <td class="text-center">
+                            <i class="fa fa-plus" aria-hidden="true"></i>
+                            <small> {{ item.Create_user|view_shortfio_user }}</small>
+                            {% if item.Update_user %}
+                                <br/>
+                                <i class="fa fa-pencil" aria-hidden="true"></i>
+                                <small> {{ item.Update_user|view_shortfio_user }}</small>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         </div>
     {% endif %}
 {% endblock %}

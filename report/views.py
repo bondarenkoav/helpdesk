@@ -2,17 +2,17 @@ import datetime
 from datetime import timedelta
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
+from django.db.models import Q
 from django.shortcuts import render
+from django.urls import reverse, reverse_lazy
 from django.views.decorators.csrf import csrf_protect
 from urllib3.connectionpool import xrange
-from django.http import JsonResponse
 
 from accounts.views import get_cur_scompany
 from exploitation.models import eproposals
 from reference_books.models import CoWorker, Posts, Status
 from report.forms import coworkers_range_date
 from dashboard.models import logging
-from django.utils.formats import localize
 
 
 @login_required
@@ -60,39 +60,49 @@ def get_jornal_changes(request, page_id=1):
     return render(request, 'jornal_change.html', {'jornal_changes': current_page.page(page_id)})
 
 
-KANBAN_COLUMN = [
-    {'label': "Принято", 'id': "open"},
-    {'label': "Сегодня", 'id': "today"},
-    {'label': "Завтра", 'id': "tomorrow"},
-    {'label': "Исполнено", 'id': "complete"},
-    {'label': "Завершено", 'id': "close"},
-]
+KANBAN_COLUMN = ["Принята", "Сегодня", "Завтра", "Исполнено", "Завершено"]
 
 
 @login_required
 def kanban(request):
+    column_list = KANBAN_COLUMN
     all_tasks = []
-    t_list = eproposals.objects.filter(
-        ServiceCompany=get_cur_scompany(request.user),
-        DateTime_schedule__lte=datetime.datetime.today(),
-        Status__in=Status.objects.filter(slug__in=['open']))
-    for t in t_list:
+
+    currdate = datetime.datetime.now().date()
+    tomorrow = currdate + datetime.timedelta(days=1)
+    if tomorrow.isoweekday() in [6, 7]:
+        column_list[2] = "Понедельник"
+
+    tasks = eproposals.objects.using('test').filter(ServiceCompany=get_cur_scompany(request.user))
+    tasks_open = tasks.filter(Status=Status.objects.get(slug='open'))
+    tasks_other = tasks.filter(Status__in=Status.objects.filter(slug__in=['complete', 'close']),
+                               DateTime_work=datetime.datetime.now().date())
+    tasks_union = tasks_open.union(tasks_other).order_by('-DateTime_add')
+
+    for t in tasks_union:
+        board_name = t.Status.Name
+
+        if t.Status.slug == "open":
+            if t.DateTime_schedule == currdate:
+                board_name = "Сегодня"
+            if tomorrow.isoweekday() in [6, 7]:
+                delta = 7 - currdate.isoweekday() + 1
+                next_monday = currdate + datetime.timedelta(days=delta)
+                if t.DateTime_schedule == next_monday:
+                    board_name = "Понедельник"
+            elif t.DateTime_schedule == datetime.datetime.now().date()+datetime.timedelta(days=1):
+                board_name = "Завтра"
         t_dict = {
-            'id': str(t.id),
-            'name': t.NumObject + "(" + t.AddressObject + ")",
-            'boardName': 'Принята',
-            'date': t.DateTime_add
+            'uuid': t.pk,
+            'client': t.Client_words,
+            'name': t.NumObject + ' (' + t.AddressObject + ')',
+            'descript': (t.DescriptionWorks if Status.slug in ['complete', 'close'] else t.FaultAppearance),
+            'boardName': board_name,
+            'date': (t.DateTime_schedule.strftime('%d.%m.%Y') if t.DateTime_schedule else 'не задан'),
+            'url': reverse('exploitation:addget_eproposals', args=[t.pk])
         }
         all_tasks.append(t_dict)
-    return render(request, 'kanban.html', {'tasks': all_tasks})
-
-    # proposals = eproposals.objects.\
-    #     filter(ServiceCompany=get_cur_scompany(request.user), DateTime_schedule__lte=datetime.datetime.today()).\
-    #     exclude(Status__in=Status.objects.filter(slug__in=['scheduled', 'transfer', 'not_fulfilled', 'control']))
-    # output = []
-    # for query in proposals:
-    #     # output.append('id': query.id, 'name': query.name, etc...)
-    #     var = output.append[
-    #           'label': query.DescriptionWorks, 'priority': 1, 'color': "#58C3FE",
-    #           'start_date': query.DateTime_add.strftime('%m/%d/%Y'), 'users': [3, 1], 'column': "open", 'type': "task"]
-    # return render(request, 'kanban.html', {'data': proposals})
+    return render(request, 'kanban.html', {
+        'column': column_list,
+        'tasks': all_tasks,
+    })

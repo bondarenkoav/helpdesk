@@ -1,3 +1,4 @@
+import re
 from datetime import datetime, timedelta
 from django.forms import CheckboxInput, ModelForm, DateField, DateInput, ModelChoiceField
 from accounts.models import Profile
@@ -70,7 +71,8 @@ class search_form(forms.Form):
 
     status = forms.ModelChoiceField(label=u'Состояние', required=False, queryset=models.Status.objects.all(),
                                     widget=forms.Select(attrs={'class': 'selector'}))
-    numobject = forms.CharField(label=u'Номер', required=False, widget=forms.widgets.NumberInput)
+    # adrobject = forms.CharField(label=u'Адрес', required=False, widget=forms.widgets.TextInput)
+    numobject = forms.CharField(label=u'Номер', required=False, widget=forms.widgets.TextInput)
     adrobject = forms.CharField(label=u'Адрес', required=False, widget=forms.widgets.TextInput)
 
     def clean(self):
@@ -78,12 +80,15 @@ class search_form(forms.Form):
         norangedate = cleaned_data['norangedate']
         startdate = cleaned_data['startdate']
         enddate = cleaned_data['enddate']
+        numobject = cleaned_data['numobject']
 
         if norangedate is False:
             if startdate is None:
                 self._errors['startdate'] = self.error_class([u'Введите дату поиска'])
             if enddate is not None and enddate < startdate:
                 self._errors['enddate'] = self.error_class([u'Дата окончания периода должна быть позже даты начала'])
+        if re.findall(r'[ _/.,]', numobject):
+            self._errors['numobject'] = self.error_class([u'В номере объекта могут использоваться только цифры и буквы, без пробелов и других символов'])
         return cleaned_data
 
 

@@ -46,8 +46,6 @@ urlpatterns = [
     # DRF
     path('api/', include('api.urls', namespace='api')),
     path('api/drf-auth/', include('rest_framework.urls')),
-    # path('api/auth/', include('djoser.urls')),
-    # re_path(r'^auth/', include('djoser.urls.authtoken')),
 
     url(r'^', include('dashboard.urls', namespace='dashboard')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

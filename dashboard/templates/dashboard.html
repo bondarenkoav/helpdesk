@@ -2,7 +2,7 @@
 {% load dashboard_tags personal_tags static %}
 
 {% block include_header %}
-    {% if charts_data %}
+{% comment %}    {% if charts_data %}
         <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script type="text/javascript">
             google.charts.load('current', {'packages':['corechart']});
@@ -26,7 +26,7 @@
                 chart.draw(data, options);
             }
         </script>
-    {% endif %}
+    {% endif %}{% endcomment %}
 {% endblock %}
 
 {% block page_title %}Панель управления{% endblock %}
@@ -50,7 +50,7 @@
                         {% informer_sim user %}
                     </div>
                     <div class="col-12">
-{#                        <div id="chart_div" style="width: 900px; height: 500px;"></div>#}
+                        {% informer_updates user %}
                     </div>
                 </div>
             </div>

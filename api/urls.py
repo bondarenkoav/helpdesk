@@ -6,10 +6,11 @@ from rest_framework import routers
 app_name = 'api'
 
 router = routers.DefaultRouter()
-router.register(r'engineer-task', EngineerTaskEProposalViewSet, basename='engineer')
+router.register(r'engineer', EngineerTaskEProposalViewSet, basename='engineer')
 router.register(r'supervisor', SupervisorTaskEProposalViewSet, basename='supervisor')
+router.register(r'kanban', KanbanEProposalViewSet, basename='kanban')
+print(router.urls)
 
 urlpatterns = [
-    # path('tasks/', KanbanListTask.as_view()),
     path('', include(router.urls)),
 ]

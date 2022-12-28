@@ -10,6 +10,7 @@ from dashboard.views import get_activeusers
 from exploitation.models import eproposals
 from dashboard.models import Menu
 from maintenance.models import mproposals, mobjects, count_completeproposals_per_month
+from newsblog.models import PostUpdate
 from reference_books.models import Status, CoWorker, Month_list
 from helpdesk.settings import *
 from accounts.forms import change_cur_scompany_form
@@ -47,6 +48,11 @@ def informer_birthdayboy():
     return {'birthdayboy': Profile.objects.filter(birthday__day=datetime.today().day,
                                                   birthday__month=datetime.today().month),
             'image_url': 'img/present_%d.png' % random.randrange(1, 4, 1)}
+
+
+# @register.inclusion_tag('templatetags/informer_updates.html')
+# def informer_newsblog():
+#     return {'posts_upd': PostUpdate.objects.filter(public=True, DateTime_add__gte=datetime.now()-timedelta(days=15))}
 
 
 @register.simple_tag()
@@ -110,10 +116,17 @@ def informer_maintenance(user):
 
 @register.inclusion_tag('templatetags/informer_sim.html')
 def informer_sim(user):
-    list_sim_work = OpSoS_card.objects.filter(Status=True,ServiceCompany=get_cur_scompany(user)).order_by('id')
+    list_sim_work = OpSoS_card.objects.filter(Status=True, ServiceCompany=get_cur_scompany(user)).order_by('id')
     list_sim_corp = list_sim_work.filter(Use_type='usesim_user').count()
     list_sim_obj = list_sim_work.filter(Use_type='usesim_object').count()
     return {'list_sim_work': list_sim_work.count(), 'list_sim_corp': list_sim_corp, 'list_sim_obj': list_sim_obj}
+
+
+@register.inclusion_tag('templatetags/informer_updates.html')
+def informer_updates(user):
+    list_posts = PostUpdate.objects.filter(public=True, DateTime_add__gte=datetime.now()-timedelta(days=15),
+                                           target_group__in=user.groups.all()).order_by('id')
+    return {'posts': list_posts}
 
 
 @register.inclusion_tag('templatetags/topbar.html')

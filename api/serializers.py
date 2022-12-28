@@ -2,6 +2,7 @@ import datetime
 
 from rest_framework import serializers
 
+from accounts.models import Profile
 from exploitation.models import eproposals
 from reference_books.models import Status, CoWorker
 
@@ -9,13 +10,19 @@ from reference_books.models import Status, CoWorker
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ('id', 'slug',)
+        fields = ('Name',)
 
 
 class CoworkersSerializer(serializers.ModelSerializer):
     class Meta:
         model = CoWorker
         fields = ('Person_FIO', 'Username',)
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ('user', 'scompany', 'scompany_current')
 
 
 class EngineerEProposalSerializer(serializers.ModelSerializer):
@@ -64,14 +71,26 @@ class SupervisorEProposalSerializer(serializers.ModelSerializer):
 
 
 class KanbanEProposalSerializer(serializers.ModelSerializer):
-    NumObject = serializers.CharField(read_only=True)
-    AddressObject = serializers.CharField(read_only=True)
-    Client_words = serializers.CharField(read_only=True)
-    FaultAppearance = serializers.CharField(read_only=True)
-    DateTime_schedule = serializers.DateField(read_only=True)
-    Status = StatusSerializer(many=False)
-
     class Meta:
         model = eproposals
         fields = ('id', 'NumObject', 'AddressObject', 'Client_words', 'FaultAppearance', 'DescriptionWorks',
                   'DateTime_schedule', 'DateTime_work', 'Status')
+        read_only_fields = ('NumObject', 'AddressObject', 'Client_words', 'FaultAppearance')
+
+    def update(self, instance, validated_data):
+        boardName = self.initial_data.get('boardName')
+        date_schedule = None
+        currdate = datetime.datetime.now().date()
+        if instance.Status.Name == 'Принята' and boardName not in ['Завершено', 'Исполнено']:
+            if boardName == 'Сегодня':
+                date_schedule = currdate
+            elif boardName == 'Завтра':
+                date_schedule = currdate + datetime.timedelta(days=1)
+            elif boardName == 'Понедельник':
+                delta = 7 - currdate.isoweekday() + 1
+                date_schedule = currdate + datetime.timedelta(days=delta)
+        validated_data.update({'DateTime_schedule': date_schedule})
+
+        return super().update(instance, validated_data)
+
+

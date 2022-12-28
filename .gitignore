@@ -10,3 +10,4 @@
 .idea/dataSources.local.xml
 .idea/dataSources.ids
 .idea/.name
+*/migrations/*.py

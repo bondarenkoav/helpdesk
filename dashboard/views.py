@@ -1,7 +1,7 @@
 import datetime
 import re
 
-from django.contrib import auth
+from django.contrib import auth, messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
@@ -69,6 +69,7 @@ def get_activeusers():
 @csrf_protect
 def search_requests(request):
     form = search_form(request.POST or None, user=request.user)
+    result = []
 
     if request.POST:
         if form.is_valid():
@@ -179,13 +180,8 @@ def search_requests(request):
             elif set == 'objects':
                 result = None
 
-            # if result.count() > 100:
-            #     result = result[:100]
-            #     message1 = u'Показано не более 100 заявок.'
-            #
-            # if mobject_s.count() > 50 and client is None:
-            #     mobject_s = mobject_s[:50]
-            #     message2 = u'Показано не более 50 объектов.'
+            if result is None:
+                messages.info(request, 'Нет результатов поиска. Попробуйте изменить параметры поиска!')
 
             return render(request, 'search.html',
                           {'form': form, 'requests': result, 'objects': mobject_s, 'type': typerequest,
